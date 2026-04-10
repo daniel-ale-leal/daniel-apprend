@@ -271,11 +271,13 @@
   .mistakes-empty{font-size:.83rem;color:var(--muted);font-style:italic;}
 
   /* Two-column layout */
-  .conv-layout{display:grid;grid-template-columns:1fr 220px;gap:1.5rem;align-items:start;}
-  @media(max-width:700px){.conv-layout{grid-template-columns:1fr;}}
+  .conv-layout{display:grid;grid-template-columns:1fr 240px;gap:1.5rem;align-items:start;}
+  @media(max-width:700px){.conv-layout{grid-template-columns:1fr;display:flex;flex-direction:column;}}
 
-  /* Left: transcript */
   .conv-left{display:flex;flex-direction:column;}
+  .conv-right{display:flex;flex-direction:column;align-items:center;}
+  @media(max-width:700px){.conv-right{order:-1;}}
+
   .conv-messages{min-height:260px;max-height:420px;overflow-y:auto;display:flex;flex-direction:column;gap:.75rem;padding:.5rem 0;margin-bottom:.75rem;}
   .conv-msg{max-width:88%;padding:.75rem 1rem;border-radius:14px;font-size:.92rem;line-height:1.6;}
   .conv-msg.claude{background:#fff;border:1.5px solid var(--parchment);align-self:flex-start;border-radius:4px 14px 14px 14px;}
@@ -284,7 +286,6 @@
   .conv-msg-correction strong{color:var(--terracotta);}
   .conv-msg-tts{background:none;border:none;cursor:pointer;font-size:.78rem;color:var(--sage);margin-top:.4rem;padding:0;display:block;}
   .conv-msg-tts:hover{color:var(--fern);}
-
   .conv-input-area{border-top:1.5px solid var(--parchment);padding-top:1rem;}
   .conv-status{text-align:center;font-size:.82rem;color:var(--muted);margin-bottom:.9rem;min-height:1.2em;}
   .conv-controls{display:flex;flex-direction:column;align-items:center;gap:.5rem;margin-bottom:.6rem;}
@@ -295,25 +296,18 @@
   .mic-btn.loading{background:#ccc;cursor:not-allowed;}
   @keyframes pulse{0%,100%{box-shadow:0 0 0 8px rgba(74,92,58,.15);}50%{box-shadow:0 0 0 16px rgba(74,92,58,.05);}}
   .mic-icon{font-size:1.6rem;pointer-events:none;}
-  .conv-transcript{min-height:1.4em;font-size:.85rem;color:var(--muted);text-align:center;font-style:italic;}
+  .conv-transcript{min-height:1.4em;font-size:.85rem;color:var(--muted);text-align:center;font-style:italic;letter-spacing:.05em;}
 
-  /* Right: croissant */
-  .conv-right{display:flex;flex-direction:column;align-items:center;}
-  .croissant-stage{display:flex;flex-direction:column;align-items:center;gap:.5rem;position:relative;padding-top:2rem;}
-  .croissant-bubble{background:#fff;border:1.5px solid var(--parchment);border-radius:14px 14px 14px 4px;padding:.65rem .9rem;font-size:.82rem;line-height:1.5;color:var(--ink);max-width:190px;margin-bottom:.5rem;position:relative;box-shadow:0 3px 12px rgba(44,36,24,.07);}
-  .croissant-svg{width:160px;height:160px;filter:drop-shadow(0 4px 12px rgba(200,130,42,.25));}
-  .croissant-name{font-family:'Playfair Display',serif;font-size:1rem;color:var(--moss);font-weight:700;}
-  .croissant-status{font-size:.75rem;color:var(--muted);font-style:italic;}
-
-  @keyframes croissantTalk{0%,100%{transform:scaleY(1);}50%{transform:scaleY(0.6);}}
+  .croissant-stage{display:flex;flex-direction:column;align-items:center;gap:.5rem;padding-top:.5rem;}
+  .croissant-bubble{display:none;}
+  .croissant-svg{width:190px;height:190px;filter:drop-shadow(0 4px 12px rgba(200,130,42,.25));}
   @keyframes croissantBounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
   .croissant-svg.talking{animation:croissantBounce .5s ease infinite;}
-
+  .croissant-name{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--moss);font-weight:700;}
+  .croissant-status{font-size:.75rem;color:var(--muted);font-style:italic;}
   @media(max-width:700px){
-    .conv-right{flex-direction:row;justify-content:center;gap:1rem;padding:1rem 0;}
-    .croissant-stage{flex-direction:row;align-items:center;padding-top:0;}
-    .croissant-svg{width:100px;height:100px;}
-    .croissant-bubble{font-size:.78rem;}
+    .croissant-svg{width:130px;height:130px;}
+    .croissant-name{font-size:.95rem;}
   }
 
   @media(max-width:600px){
@@ -1650,14 +1644,15 @@ let silenceTimer = null;
 let audioContext = null;
 let silenceAnalyser = null;
 let silenceStream = null;
-const SILENCE_THRESHOLD = 12;  // volume level below which = silence
-const SILENCE_DELAY = 1600;    // ms of silence before auto-send
+let silenceDetectionFrame = null;
+const SILENCE_THRESHOLD = 8;   // lower = more sensitive
+const SILENCE_DELAY = 1800;    // ms of silence before auto-send
 
 function startListening(){
   if(isListening) return;
   if(convSpeaking) speechSynth.cancel();
 
-  navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+  navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(stream => {
     isListening = true;
     audioChunks = [];
     silenceStream = stream;
@@ -1669,18 +1664,26 @@ function startListening(){
     hideCroissantBubble();
 
     // Start recording
-    const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
+    const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus'
+                   : MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm'
+                   : 'audio/mp4';
     mediaRecorder = new MediaRecorder(stream, { mimeType });
     mediaRecorder.ondataavailable = e => { if(e.data.size > 0) audioChunks.push(e.data); };
     mediaRecorder.start(100);
 
-    // Silence detection via Web Audio API
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    silenceAnalyser = audioContext.createAnalyser();
-    silenceAnalyser.fftSize = 512;
-    const source = audioContext.createMediaStreamSource(stream);
-    source.connect(silenceAnalyser);
-    detectSilence();
+    // Silence detection
+    try {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      silenceAnalyser = audioContext.createAnalyser();
+      silenceAnalyser.fftSize = 256;
+      silenceAnalyser.smoothingTimeConstant = 0.3;
+      const source = audioContext.createMediaStreamSource(stream);
+      source.connect(silenceAnalyser);
+      detectSilence();
+    } catch(e) {
+      console.warn('AudioContext failed, using fallback timeout', e);
+      // Fallback: no silence detection, just record
+    }
 
   }).catch(err => {
     showToast('Accès au micro refusé. Autorisez le micro dans les paramètres.');
@@ -1689,29 +1692,38 @@ function startListening(){
 }
 
 function detectSilence(){
-  if(!isListening) return;
+  if(!isListening || !silenceAnalyser) return;
   const data = new Uint8Array(silenceAnalyser.frequencyBinCount);
   silenceAnalyser.getByteFrequencyData(data);
-  const avg = data.reduce((a,b) => a+b, 0) / data.length;
 
-  if(avg < SILENCE_THRESHOLD){
-    if(!silenceTimer){
+  // Use max value instead of average — more reliable
+  let max = 0;
+  for(let i = 0; i < data.length; i++) if(data[i] > max) max = data[i];
+
+  // Show volume in status so we can debug
+  const bars = Math.round(max / 25);
+  const bar = '▮'.repeat(bars) + '▯'.repeat(Math.max(0, 5-bars));
+  if(isListening) document.getElementById('conv-transcript').textContent = bar;
+
+  if(max < SILENCE_THRESHOLD){
+    if(!silenceTimer && audioChunks.length > 5){
       silenceTimer = setTimeout(() => {
-        if(isListening && audioChunks.length > 3) stopListening();
         silenceTimer = null;
+        if(isListening) stopListening();
       }, SILENCE_DELAY);
     }
   } else {
-    // Sound detected — reset silence timer
     if(silenceTimer){ clearTimeout(silenceTimer); silenceTimer = null; }
   }
-  requestAnimationFrame(detectSilence);
+
+  silenceDetectionFrame = requestAnimationFrame(detectSilence);
 }
 
 async function stopListening(){
   if(!isListening || !mediaRecorder) return;
   isListening = false;
   if(silenceTimer){ clearTimeout(silenceTimer); silenceTimer = null; }
+  if(silenceDetectionFrame){ cancelAnimationFrame(silenceDetectionFrame); silenceDetectionFrame = null; }
   if(audioContext) { audioContext.close(); audioContext = null; }
   document.getElementById('mic-btn').classList.remove('listening');
   document.getElementById('mic-label').textContent = 'Appuyer pour parler';
