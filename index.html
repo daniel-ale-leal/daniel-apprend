@@ -1540,6 +1540,7 @@ function startListening(){
   recognition.lang = 'fr-FR';
   recognition.continuous = true;
   recognition.interimResults = true;
+  recognition.maxAlternatives = 1;
 
   recognition.onstart = () => {
     isListening = true;
@@ -1549,8 +1550,13 @@ function startListening(){
   };
 
   recognition.onresult = (e) => {
-    const transcript = Array.from(e.results).map(r => r[0].transcript).join('');
-    document.getElementById('conv-transcript').textContent = transcript;
+    // Use only the most recent result to avoid rewriting
+    let transcript = '';
+    for(let i = e.resultIndex; i < e.results.length; i++){
+      transcript += e.results[i][0].transcript;
+    }
+    const current = document.getElementById('conv-transcript').textContent;
+    document.getElementById('conv-transcript').textContent = (current + ' ' + transcript).trim();
   };
 
   recognition.onerror = (e) => {
