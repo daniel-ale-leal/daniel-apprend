@@ -1639,8 +1639,8 @@ let audioContext = null;
 let silenceAnalyser = null;
 let silenceStream = null;
 let silenceDetectionFrame = null;
-const SILENCE_THRESHOLD = 8;   // lower = more sensitive
-const SILENCE_DELAY = 1800;    // ms of silence before auto-send
+const SILENCE_THRESHOLD = 30;  // raised — ignores background noise/dogs
+const SILENCE_DELAY = 2200;    // ms of silence before auto-send
 
 function startListening(){
   if(isListening) return;
@@ -1649,6 +1649,7 @@ function startListening(){
   navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(stream => {
     isListening = true;
     audioChunks = [];
+    volumeHistory = [];
     silenceStream = stream;
     document.getElementById('mic-btn').classList.add('listening');
     setConvStatus('Je vous écoute...');
@@ -1685,21 +1686,27 @@ function startListening(){
   });
 }
 
+let volumeHistory = [];
+
 function detectSilence(){
   if(!isListening || !silenceAnalyser) return;
   const data = new Uint8Array(silenceAnalyser.frequencyBinCount);
   silenceAnalyser.getByteFrequencyData(data);
 
-  // Use max value instead of average — more reliable
+  // Use max value
   let max = 0;
   for(let i = 0; i < data.length; i++) if(data[i] > max) max = data[i];
 
-  // Show volume in status so we can debug
-  const bars = Math.round(max / 25);
-  const bar = '▮'.repeat(bars) + '▯'.repeat(Math.max(0, 5-bars));
-  if(isListening) document.getElementById('conv-transcript').textContent = bar;
+  // Rolling average over last 8 frames to smooth out sudden noises
+  volumeHistory.push(max);
+  if(volumeHistory.length > 8) volumeHistory.shift();
+  const avgMax = volumeHistory.reduce((a,b) => a+b, 0) / volumeHistory.length;
 
-  if(max < SILENCE_THRESHOLD){
+  // Show volume bars
+  const bars = Math.round(avgMax / 20);
+  if(isListening) document.getElementById('conv-transcript').textContent = '▮'.repeat(Math.min(bars,8)) + '▯'.repeat(Math.max(0, 8-bars));
+
+  if(avgMax < SILENCE_THRESHOLD){
     if(!silenceTimer && audioChunks.length > 5){
       silenceTimer = setTimeout(() => {
         silenceTimer = null;
