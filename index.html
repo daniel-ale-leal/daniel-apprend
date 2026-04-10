@@ -1646,6 +1646,13 @@ function hideCroissantBubble(){
   document.getElementById('croissant-bubble').style.display='none';
 }
 
+let silenceTimer = null;
+let audioContext = null;
+let silenceAnalyser = null;
+let silenceStream = null;
+const SILENCE_THRESHOLD = 12;  // volume level below which = silence
+const SILENCE_DELAY = 1600;    // ms of silence before auto-send
+
 function startListening(){
   if(isListening) return;
   if(convSpeaking) speechSynth.cancel();
@@ -1653,25 +1660,59 @@ function startListening(){
   navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
     isListening = true;
     audioChunks = [];
+    silenceStream = stream;
     document.getElementById('mic-btn').classList.add('listening');
     setConvStatus('Je vous écoute...');
     document.getElementById('conv-transcript').textContent = '';
-    document.getElementById('mic-label').textContent = 'Appuyer pour arrêter';
+    document.getElementById('mic-label').textContent = 'Parlez — silence pour envoyer';
     setCroissantState('listening');
     hideCroissantBubble();
 
-    mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+    // Start recording
+    const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
+    mediaRecorder = new MediaRecorder(stream, { mimeType });
     mediaRecorder.ondataavailable = e => { if(e.data.size > 0) audioChunks.push(e.data); };
     mediaRecorder.start(100);
+
+    // Silence detection via Web Audio API
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    silenceAnalyser = audioContext.createAnalyser();
+    silenceAnalyser.fftSize = 512;
+    const source = audioContext.createMediaStreamSource(stream);
+    source.connect(silenceAnalyser);
+    detectSilence();
+
   }).catch(err => {
     showToast('Accès au micro refusé. Autorisez le micro dans les paramètres.');
     console.error(err);
   });
 }
 
+function detectSilence(){
+  if(!isListening) return;
+  const data = new Uint8Array(silenceAnalyser.frequencyBinCount);
+  silenceAnalyser.getByteFrequencyData(data);
+  const avg = data.reduce((a,b) => a+b, 0) / data.length;
+
+  if(avg < SILENCE_THRESHOLD){
+    if(!silenceTimer){
+      silenceTimer = setTimeout(() => {
+        if(isListening && audioChunks.length > 3) stopListening();
+        silenceTimer = null;
+      }, SILENCE_DELAY);
+    }
+  } else {
+    // Sound detected — reset silence timer
+    if(silenceTimer){ clearTimeout(silenceTimer); silenceTimer = null; }
+  }
+  requestAnimationFrame(detectSilence);
+}
+
 async function stopListening(){
   if(!isListening || !mediaRecorder) return;
   isListening = false;
+  if(silenceTimer){ clearTimeout(silenceTimer); silenceTimer = null; }
+  if(audioContext) { audioContext.close(); audioContext = null; }
   document.getElementById('mic-btn').classList.remove('listening');
   document.getElementById('mic-label').textContent = 'Appuyer pour parler';
   setCroissantState('thinking');
@@ -1679,48 +1720,65 @@ async function stopListening(){
   await new Promise(resolve => {
     mediaRecorder.onstop = resolve;
     mediaRecorder.stop();
-    mediaRecorder.stream.getTracks().forEach(t => t.stop());
+    silenceStream.getTracks().forEach(t => t.stop());
   });
 
   if(!audioChunks.length){
     setConvStatus('Rien entendu — réessayez');
+    setCroissantState('idle');
     return;
   }
 
   document.getElementById('mic-btn').classList.add('loading');
   setConvStatus('Transcription en cours...');
 
+  const openaiKey = getOpenAIKey();
+  if(!openaiKey){
+    showToast('Clé OpenAI manquante — vérifiez Firebase');
+    document.getElementById('mic-btn').classList.remove('loading');
+    setCroissantState('idle');
+    return;
+  }
+
   try {
-    const blob = new Blob(audioChunks, { type: 'audio/webm' });
+    const mimeType = audioChunks[0]?.type || 'audio/webm';
+    const ext = mimeType.includes('mp4') ? 'mp4' : 'webm';
+    const blob = new Blob(audioChunks, { type: mimeType });
     const formData = new FormData();
-    formData.append('file', blob, 'audio.webm');
+    formData.append('file', blob, 'audio.' + ext);
     formData.append('model', 'whisper-1');
     formData.append('language', 'fr');
-    formData.append('prompt', 'Transcris exactement ce qui est dit, sans corriger les erreurs grammaticales.');
+    formData.append('prompt', 'Transcris exactement ce qui est dit en français, sans corriger les erreurs grammaticales. Garde les mots tels quels même si incorrects.');
 
     const res = await fetch('https://api.openai.com/v1/audio/transcriptions', {
       method: 'POST',
-      headers: { 'Authorization': 'Bearer ' + getOpenAIKey() },
+      headers: { 'Authorization': 'Bearer ' + openaiKey },
       body: formData
     });
+
+    if(!res.ok){
+      const err = await res.json().catch(()=>({}));
+      throw new Error(err.error?.message || 'Erreur Whisper ' + res.status);
+    }
 
     const data = await res.json();
     const transcript = (data.text || '').trim();
 
     if(transcript){
       document.getElementById('conv-transcript').textContent = transcript;
-      await new Promise(r => setTimeout(r, 400));
+      await new Promise(r => setTimeout(r, 500));
       document.getElementById('conv-transcript').textContent = '';
       addMessage('user', transcript);
-      setConvStatus('Claude réfléchit...');
+      setConvStatus('Marcel réfléchit...');
       await claudeRespond(transcript);
-      setConvStatus('Maintenez le micro pour parler');
     } else {
       setConvStatus('Rien entendu — réessayez');
+      setCroissantState('idle');
     }
   } catch(err) {
-    console.error(err);
-    setConvStatus('Erreur de transcription — réessayez');
+    console.error('Whisper error:', err);
+    showToast('Erreur : ' + err.message);
+    setConvStatus('Erreur — réessayez');
     setCroissantState('idle');
   } finally {
     document.getElementById('mic-btn').classList.remove('loading');
