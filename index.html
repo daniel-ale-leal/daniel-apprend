@@ -1293,7 +1293,6 @@ let currentNewsCategory = 'facile';
 let currentArticle = null;
 let currentPopupWord = null;
 let currentPopupTranslation = null;
-let speechSynth = window.speechSynthesis;
 let isSpeaking = false;
 
 function setNewsCategory(btn){
@@ -1381,7 +1380,7 @@ function openArticle(idx){
 }
 
 function closeArticle(){
-  if(isSpeaking){ speechSynth.cancel(); isSpeaking=false; }
+  if(isSpeaking){ window.speechSynthesis.cancel(); isSpeaking=false; }
   document.getElementById('article-reader').style.display = 'none';
   document.getElementById('news-list').style.display = 'block';
   closePopup();
@@ -1487,24 +1486,21 @@ function listenArticle(){
   if(!currentArticle) return;
   const btn = document.getElementById('listen-btn');
   if(isSpeaking){
-    speechSynth.cancel();
+    window.speechSynthesis.cancel();
     isSpeaking = false;
     btn.textContent = '🔊 Écouter';
     btn.classList.remove('playing');
     return;
   }
   const text = currentArticle.title + '. ' + (currentArticle.description || '');
-  const utt = new SpeechSynthesisUtterance(text);
-  utt.lang = 'fr-FR';
-  utt.rate = 0.85;
-  const voice = selectedVoice || getBestFrenchVoice();
-  if(voice) utt.voice = voice;
-  utt.onend = () => { isSpeaking=false; btn.textContent='🔊 Écouter'; btn.classList.remove('playing'); };
-  utt.onerror = () => { isSpeaking=false; btn.textContent='🔊 Écouter'; btn.classList.remove('playing'); };
-  speechSynth.speak(utt);
   isSpeaking = true;
   btn.textContent = '⏹ Arrêter';
   btn.classList.add('playing');
+  speakText(text, () => {
+    isSpeaking = false;
+    btn.textContent = '🔊 Écouter';
+    btn.classList.remove('playing');
+  });
 }
 
 /* ════════════════════════════════════════
@@ -1550,8 +1546,6 @@ async function startConversation(scenarioKey){
   renderMistakes();
 
   // Build voice picker (voices may load async)
-  if(speechSynth.getVoices().length) buildVoicePicker();
-  else speechSynth.onvoiceschanged = buildVoicePicker;
 
   // Claude opens the conversation
   setConvStatus('Claude prépare la conversation...');
@@ -1560,7 +1554,7 @@ async function startConversation(scenarioKey){
 
 function endConversation(){
   if(mediaRecorder && isListening){ mediaRecorder.stop(); mediaRecorder.stream?.getTracks().forEach(t=>t.stop()); }
-  if(convSpeaking) speechSynth.cancel();
+  if(convSpeaking) window.speechSynthesis.cancel();
   isListening = false;
   document.getElementById('conversation-area').style.display = 'none';
   document.getElementById('scenario-picker').style.display = 'block';
@@ -1650,7 +1644,7 @@ const SILENCE_DELAY = 1800;    // ms of silence before auto-send
 
 function startListening(){
   if(isListening) return;
-  if(convSpeaking) speechSynth.cancel();
+  if(convSpeaking) window.speechSynthesis.cancel();
 
   navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(stream => {
     isListening = true;
@@ -1872,6 +1866,8 @@ ou si l'utilisateur a fait une erreur :
     speakText(cleanReply, () => {
       setCroissantState('idle');
       setConvStatus('Tapez le micro pour parler');
+      // Auto-open mic after Marcel finishes
+      setTimeout(() => startListening(), 400);
     });
 
   } catch(err){
@@ -1918,70 +1914,56 @@ function addMessageWithCorrection(role, text, correction){
 }
 
 /* ── TTS ── */
-let selectedVoice = null;
-
-function getBestFrenchVoice(){
-  const voices = speechSynth.getVoices();
-  // Priority order: native French voices
-  const priorities = [
-    v => v.lang === 'fr-FR' && !v.localService === false, // online fr-FR first
-    v => v.lang === 'fr-FR',
-    v => v.lang === 'fr-CA',
-    v => v.lang === 'fr-BE',
-    v => v.lang === 'fr-CH',
-    v => v.lang.startsWith('fr'),
-  ];
-  for(const check of priorities){
-    const match = voices.find(check);
-    if(match) return match;
+// OpenAI TTS — replaces browser voices entirely
+async function speakText(text, onEnd){
+  const openaiKey = getOpenAIKey();
+  if(!openaiKey){
+    // Fallback to browser TTS if no OpenAI key
+    const utt = new SpeechSynthesisUtterance(text);
+    utt.lang = 'fr-FR'; utt.rate = 0.85;
+    if(onEnd) utt.onend = onEnd;
+    window.speechSynthesis.speak(utt);
+    return;
   }
-  return null;
+
+  try {
+    const res = await fetch('https://api.openai.com/v1/audio/speech', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + openaiKey,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'tts-1',
+        input: text,
+        voice: 'nova',   // nova = warm female French, sounds great
+        speed: 0.92
+      })
+    });
+
+    if(!res.ok) throw new Error('TTS error ' + res.status);
+
+    const arrayBuffer = await res.arrayBuffer();
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const decoded = await audioCtx.decodeAudioData(arrayBuffer);
+    const source = audioCtx.createBufferSource();
+    source.buffer = decoded;
+    source.connect(audioCtx.destination);
+    source.onended = () => { audioCtx.close(); if(onEnd) onEnd(); };
+    source.start(0);
+
+  } catch(err) {
+    console.error('TTS error:', err);
+    // Fallback to browser TTS
+    const utt = new SpeechSynthesisUtterance(text);
+    utt.lang = 'fr-FR'; utt.rate = 0.85;
+    if(onEnd) utt.onend = onEnd;
+    window.speechSynthesis.speak(utt);
+    if(onEnd) setTimeout(onEnd, text.length * 60);
+  }
 }
 
-function speakText(text, onEnd){
-  if(!speechSynth) return;
-  speechSynth.cancel();
-  const utt = new SpeechSynthesisUtterance(text);
-  utt.lang = 'fr-FR';
-  utt.rate = 0.82;
-  utt.pitch = 1.0;
-  const voice = selectedVoice || getBestFrenchVoice();
-  if(voice) utt.voice = voice;
-  if(onEnd) utt.onend = onEnd;
-  speechSynth.speak(utt);
-}
-
-function buildVoicePicker(){
-  const voices = speechSynth.getVoices().filter(v => v.lang.startsWith('fr'));
-  if(!voices.length) return;
-  const existing = document.getElementById('voice-picker-row');
-  if(existing) existing.remove();
-  const row = document.createElement('div');
-  row.id = 'voice-picker-row';
-  row.style.cssText = 'margin-top:.7rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;';
-  row.innerHTML = `<span style="font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);">Voix :</span>`;
-  voices.forEach((v, i) => {
-    const btn = document.createElement('button');
-    btn.textContent = v.name.replace('(fr','').replace(')','').trim();
-    btn.style.cssText = 'padding:.28rem .65rem;border:1.5px solid var(--parchment);border-radius:20px;background:#fff;font-family:Lato,sans-serif;font-size:.72rem;cursor:pointer;color:var(--muted);';
-    btn.onclick = () => {
-      selectedVoice = v;
-      document.querySelectorAll('#voice-picker-row button').forEach(b => {
-        b.style.background='#fff'; b.style.color='var(--muted)'; b.style.borderColor='var(--parchment)';
-      });
-      btn.style.background='var(--moss)'; btn.style.color='#fff'; btn.style.borderColor='var(--moss)';
-      speakText('Bonjour, je suis votre assistant français !');
-    };
-    if(i===0){
-      selectedVoice = v;
-      btn.style.background='var(--moss)'; btn.style.color='#fff'; btn.style.borderColor='var(--moss)';
-    }
-    row.appendChild(btn);
-  });
-  // Attach below conv input area
-  const inputArea = document.getElementById('conv-input-area') || document.querySelector('.conv-input-area');
-  if(inputArea) inputArea.appendChild(row);
-}
+function buildVoicePicker(){ /* no longer needed — using OpenAI TTS */ }
 
 function setConvStatus(msg){
   document.getElementById('conv-status').textContent = msg;
