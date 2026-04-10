@@ -862,7 +862,6 @@ async function initData() {
   if(openaiKey) localStorage.setItem('dalf-openai-key', openaiKey);
   updateHomeCount();
   renderCustomCatButtons();
-  initApiBanner();
 }
 
 /* ════════════════════════════════════════
@@ -936,17 +935,6 @@ window.addEventListener('popstate', e=>{
 /* ════════════════════════════════════════
    API KEY
 ════════════════════════════════════════ */
-function saveApiKey(){
-  const key=document.getElementById('api-key-input').value.trim();
-  if(!key.startsWith('sk-')){showToast('Clé API invalide — elle doit commencer par sk-'); return;}
-  localStorage.setItem('dalf-api-key', key);
-  fbSave('apiKey', key);
-  showToast('✓ Clé API enregistrée !');
-}
-function clearApiKey(){
-  localStorage.removeItem('dalf-api-key');
-  fbSave('apiKey', '');
-}
 function getApiKey(){ return localStorage.getItem('dalf-api-key')||''; }
 
 /* ════════════════════════════════════════
@@ -1949,8 +1937,6 @@ window.checkPassword = checkPassword;
 window.logout = logout;
 window.showSection = showSection;
 window.showHome = showHome;
-window.saveApiKey = saveApiKey;
-window.clearApiKey = clearApiKey;
 window.selectCategory = selectCategory;
 window.resetExercises = resetExercises;
 window.generateExercises = generateExercises;
