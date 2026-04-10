@@ -203,7 +203,98 @@
   @keyframes cardPop{from{opacity:0;transform:scale(.91);}to{opacity:1;transform:scale(1);}}
   .flashcard{animation:cardPop .28s ease both;}
 
-  /* ── MOBILE ── */
+  /* ── LECTURE SECTION ── */
+  .news-toolbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;margin-bottom:1.25rem;}
+  .news-categories{display:flex;gap:.4rem;flex-wrap:wrap;}
+  .news-cat-btn{padding:.35rem .8rem;background:#fff;border:1.5px solid var(--parchment);border-radius:20px;font-family:'Lato',sans-serif;font-size:.78rem;font-weight:700;color:var(--muted);cursor:pointer;transition:all .18s;}
+  .news-cat-btn:hover{border-color:var(--sage);color:var(--moss);}
+  .news-cat-btn.active{background:var(--moss);color:#fff;border-color:var(--moss);}
+  .news-refresh-btn{padding:.35rem .9rem;background:#fff;border:1.5px solid var(--parchment);border-radius:20px;font-family:'Lato',sans-serif;font-size:.78rem;font-weight:700;color:var(--fern);cursor:pointer;transition:all .18s;}
+  .news-refresh-btn:hover{border-color:var(--fern);}
+
+  /* Article cards */
+  .news-card{background:#fff;border:1.5px solid var(--parchment);border-radius:14px;padding:1.2rem 1.4rem;margin-bottom:.9rem;cursor:pointer;transition:transform .18s,box-shadow .18s,border-color .18s;}
+  .news-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(44,36,24,.09);border-color:var(--sage);}
+  .news-card-source{font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--terracotta);margin-bottom:.4rem;}
+  .news-card-title{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--ink);line-height:1.4;margin-bottom:.5rem;}
+  .news-card-desc{font-size:.82rem;color:var(--muted);line-height:1.5;}
+  .news-card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:.7rem;}
+  .news-card-date{font-size:.72rem;color:var(--muted);}
+  .news-card-read{font-size:.75rem;font-weight:700;color:var(--fern);}
+  .news-loading{text-align:center;padding:3rem 1rem;color:var(--muted);font-size:.9rem;}
+  .news-loading .spin{display:inline-block;animation:spin .8s linear infinite;font-size:1.5rem;margin-bottom:.5rem;display:block;}
+  .news-empty{text-align:center;padding:3rem 1rem;color:var(--muted);}
+
+  /* Article reader */
+  .reader-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
+  .reader-listen-btn{display:flex;align-items:center;gap:.4rem;padding:.4rem .9rem;background:#fff;border:1.5px solid var(--parchment);border-radius:20px;font-family:'Lato',sans-serif;font-size:.78rem;font-weight:700;color:var(--fern);cursor:pointer;transition:all .18s;}
+  .reader-listen-btn:hover{border-color:var(--fern);}
+  .reader-listen-btn.playing{background:var(--fern);color:#fff;border-color:var(--fern);}
+  .reader-source{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--terracotta);margin-bottom:.5rem;}
+  .reader-title{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--moss);line-height:1.4;margin-bottom:1rem;}
+  .reader-hint{font-size:.78rem;color:var(--muted);background:var(--parchment);padding:.5rem .9rem;border-radius:8px;margin-bottom:1.2rem;font-style:italic;}
+  .reader-body{font-size:1rem;line-height:1.9;color:var(--ink);}
+  .reader-word{cursor:pointer;border-radius:3px;padding:0 1px;transition:background .15s;}
+  .reader-word:hover{background:rgba(163,177,138,.35);}
+  .reader-word.saved{background:rgba(107,127,85,.18);color:var(--moss);font-weight:700;}
+  .reader-word.looked-up{background:rgba(163,177,138,.2);}
+
+  /* Word popup */
+  .word-popup{position:fixed;bottom:5rem;left:50%;transform:translateX(-50%);background:#fff;border:1.5px solid var(--parchment);border-radius:14px;padding:1.1rem 1.3rem;box-shadow:0 8px 32px rgba(44,36,24,.15);z-index:200;min-width:240px;max-width:320px;width:90%;}
+  .word-popup-fr{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--moss);font-weight:700;margin-bottom:.3rem;}
+  .word-popup-es{font-size:.9rem;color:var(--ink);margin-bottom:.9rem;min-height:1.4em;}
+  .popup-loading{color:var(--muted);font-style:italic;font-size:.82rem;}
+  .word-popup-actions{display:flex;gap:.5rem;}
+  .popup-save-btn{flex:1;padding:.5rem;background:var(--terracotta);color:#fff;border:none;border-radius:8px;font-family:'Lato',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer;transition:background .18s;}
+  .popup-save-btn:hover{background:var(--clay);}
+  .popup-save-btn:disabled{background:#ccc;cursor:default;}
+  .popup-close-btn{padding:.5rem .8rem;background:var(--cream);border:1.5px solid var(--parchment);border-radius:8px;font-family:'Lato',sans-serif;font-size:.82rem;cursor:pointer;}
+
+  /* ── CONVERSATION SECTION ── */
+  .scenario-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:.9rem;margin-bottom:1.5rem;}
+  .scenario-card{background:#fff;border:1.5px solid var(--parchment);border-radius:14px;padding:1.2rem 1rem;cursor:pointer;transition:transform .18s,box-shadow .18s,border-color .18s;text-align:center;}
+  .scenario-card:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(44,36,24,.1);border-color:var(--sage);}
+  .scenario-icon{font-size:1.8rem;display:block;margin-bottom:.5rem;}
+  .scenario-name{font-family:'Playfair Display',serif;font-size:.95rem;color:var(--ink);margin-bottom:.25rem;font-weight:700;}
+  .scenario-desc{font-size:.75rem;color:var(--muted);line-height:1.4;}
+  .conv-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem;}
+  .conv-scenario-badge{font-size:.8rem;font-weight:700;color:var(--moss);background:rgba(74,92,58,.1);padding:.3rem .8rem;border-radius:20px;}
+  .conv-end-btn{padding:.35rem .8rem;background:none;border:1.5px solid var(--parchment);border-radius:20px;font-family:'Lato',sans-serif;font-size:.75rem;color:var(--muted);cursor:pointer;}
+  .conv-end-btn:hover{border-color:var(--terracotta);color:var(--terracotta);}
+  .conv-mistakes-btn{padding:.35rem .8rem;background:none;border:1.5px solid var(--parchment);border-radius:20px;font-family:'Lato',sans-serif;font-size:.75rem;color:var(--fern);cursor:pointer;}
+  .conv-mistakes-btn:hover{border-color:var(--fern);}
+  .mistakes-panel{background:var(--parchment);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1rem;}
+  .mistakes-title{font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.7rem;}
+  .mistake-item{background:#fff;border-radius:8px;padding:.6rem .9rem;margin-bottom:.5rem;font-size:.83rem;line-height:1.5;border-left:3px solid var(--terracotta);}
+  .mistake-item .mistake-type{font-size:.68rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--terracotta);margin-bottom:.2rem;}
+  .mistake-item .mistake-count{font-size:.7rem;color:var(--muted);float:right;}
+  .mistakes-empty{font-size:.83rem;color:var(--muted);font-style:italic;}
+  .conv-messages{min-height:300px;max-height:480px;overflow-y:auto;display:flex;flex-direction:column;gap:.75rem;padding:.5rem 0;margin-bottom:1rem;}
+  .conv-msg{max-width:85%;padding:.8rem 1rem;border-radius:14px;font-size:.92rem;line-height:1.6;}
+  .conv-msg.claude{background:#fff;border:1.5px solid var(--parchment);align-self:flex-start;border-radius:4px 14px 14px 14px;}
+  .conv-msg.user{background:var(--moss);color:#fff;align-self:flex-end;border-radius:14px 14px 4px 14px;}
+  .conv-msg-correction{background:rgba(192,113,79,.08);border:1px solid rgba(192,113,79,.25);border-radius:8px;padding:.5rem .75rem;margin-top:.5rem;font-size:.8rem;color:var(--clay);line-height:1.5;}
+  .conv-msg-correction strong{color:var(--terracotta);}
+  .conv-msg-tts{background:none;border:none;cursor:pointer;font-size:.8rem;color:var(--sage);margin-top:.4rem;padding:0;display:block;}
+  .conv-msg-tts:hover{color:var(--fern);}
+  .conv-input-area{border-top:1.5px solid var(--parchment);padding-top:1.2rem;}
+  .conv-status{text-align:center;font-size:.82rem;color:var(--muted);margin-bottom:.9rem;min-height:1.2em;}
+  .conv-controls{display:flex;justify-content:center;margin-bottom:.8rem;}
+  .mic-btn{width:72px;height:72px;border-radius:50%;background:var(--terracotta);border:none;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(192,113,79,.3);}
+  .mic-btn:hover{background:var(--clay);transform:scale(1.05);}
+  .mic-btn.listening{background:var(--moss);box-shadow:0 0 0 8px rgba(74,92,58,.15),0 4px 16px rgba(74,92,58,.3);animation:pulse 1.2s ease infinite;}
+  .mic-btn.loading{background:#ccc;cursor:not-allowed;}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 8px rgba(74,92,58,.15);}50%{box-shadow:0 0 0 16px rgba(74,92,58,.05);}}
+  .mic-icon{font-size:1.8rem;pointer-events:none;}
+  .conv-transcript{min-height:1.5em;font-size:.88rem;color:var(--muted);text-align:center;font-style:italic;padding:0 1rem;}
+
+  @media(max-width:600px){
+    .news-categories{gap:.3rem;}
+    .news-cat-btn{font-size:.72rem;padding:.3rem .65rem;}
+    .reader-title{font-size:1.15rem;}
+    .reader-body{font-size:.95rem;}
+    .word-popup{bottom:4rem;}
+  }
   @media(max-width:600px){
     header{padding:.7rem 1rem;}
     .header-title{font-size:.95rem;}
@@ -303,8 +394,8 @@
         <div class="section-card fade-up" style="--card-accent:#a3b18a" onclick="showSection('reading')">
           <span class="card-icon">📰</span>
           <div class="card-title">Lecture</div>
-          <div class="card-desc">Textes courts avec aide à la compréhension intégrée.</div>
-          <span class="card-coming-soon">bientôt disponible</span>
+          <div class="card-desc">Actualités françaises — cliquez sur les mots pour les traduire et les sauvegarder.</div>
+          <span class="card-count">Presse française</span>
         </div>
         <div class="section-card fade-up" style="--card-accent:#8b6f47" onclick="showSection('listening')">
           <span class="card-icon">🎧</span>
@@ -314,9 +405,9 @@
         </div>
         <div class="section-card fade-up" style="--card-accent:#c0714f" onclick="showSection('speaking')">
           <span class="card-icon">🗣️</span>
-          <div class="card-title">Expression orale</div>
-          <div class="card-desc">Pratiquez la prononciation et l'expression à l'oral.</div>
-          <span class="card-coming-soon">bientôt disponible</span>
+          <div class="card-title">Conversation</div>
+          <div class="card-desc">Parlez en français avec un assistant IA — il corrige vos erreurs et les retient.</div>
+          <span class="card-count">6 scénarios</span>
         </div>
       </div>
     </div>
@@ -431,8 +522,50 @@
     <!-- OTHER SECTIONS -->
     <div id="reading-view" class="section-view">
       <button class="back-btn" onclick="showHome()">← retour</button>
-      <div class="section-header"><span class="section-header-icon">📰</span><h2>Lecture</h2></div>
-      <div class="placeholder-box"><strong>Cette section arrive bientôt !</strong><p>Des textes courts avec glossaire intégré seront disponibles ici.</p></div>
+      <div class="section-header">
+        <span class="section-header-icon">📰</span>
+        <h2>Lecture</h2>
+      </div>
+
+      <!-- News toolbar -->
+      <div class="news-toolbar">
+        <div class="news-categories">
+          <button class="news-cat-btn active" data-cat="facile" onclick="setNewsCategory(this)">⭐ Facile</button>
+          <button class="news-cat-btn" data-cat="france" onclick="setNewsCategory(this)">🇫🇷 France</button>
+          <button class="news-cat-btn" data-cat="monde" onclick="setNewsCategory(this)">🌍 Monde</button>
+          <button class="news-cat-btn" data-cat="culture" onclick="setNewsCategory(this)">🎭 Culture</button>
+          <button class="news-cat-btn" data-cat="sport" onclick="setNewsCategory(this)">⚽ Sport</button>
+        </div>
+        <button class="news-refresh-btn" onclick="loadNews()">↺ Actualiser</button>
+      </div>
+
+      <!-- Article list -->
+      <div id="news-list"></div>
+
+      <!-- Article reader overlay -->
+      <div id="article-reader" style="display:none">
+        <div class="reader-header">
+          <button class="back-btn" onclick="closeArticle()" style="padding:0;margin-bottom:0">← retour aux articles</button>
+          <button class="reader-listen-btn" onclick="listenArticle()" id="listen-btn">🔊 Écouter</button>
+        </div>
+        <div class="reader-source" id="reader-source"></div>
+        <h3 class="reader-title" id="reader-title"></h3>
+        <div class="reader-hint">💡 Cliquez sur n'importe quel mot pour le traduire et l'ajouter à votre vocabulaire</div>
+        <div class="reader-body" id="reader-body"></div>
+      </div>
+
+      <!-- Word popup -->
+      <div id="word-popup" class="word-popup" style="display:none">
+        <div class="word-popup-fr" id="popup-fr"></div>
+        <div class="word-popup-es" id="popup-es">
+          <span class="popup-loading">traduciendo...</span>
+        </div>
+        <div class="word-popup-actions">
+          <button class="popup-save-btn" id="popup-save" onclick="savePopupWord()">➕ Guardar en vocab</button>
+          <button class="popup-close-btn" onclick="closePopup()">✕</button>
+        </div>
+      </div>
+      <div id="popup-overlay" style="display:none;position:fixed;inset:0;z-index:199;" onclick="closePopup()"></div>
     </div>
     <div id="listening-view" class="section-view">
       <button class="back-btn" onclick="showHome()">← retour</button>
@@ -441,8 +574,88 @@
     </div>
     <div id="speaking-view" class="section-view">
       <button class="back-btn" onclick="showHome()">← retour</button>
-      <div class="section-header"><span class="section-header-icon">🗣️</span><h2>Expression orale</h2></div>
-      <div class="placeholder-box"><strong>Cette section arrive bientôt !</strong><p>Des exercices de prononciation seront disponibles ici.</p></div>
+      <div class="section-header">
+        <span class="section-header-icon">🗣️</span>
+        <h2>Conversation</h2>
+      </div>
+
+      <!-- Scenario picker -->
+      <div id="scenario-picker">
+        <p style="color:var(--muted);font-size:.9rem;margin-bottom:1rem;">Choisissez un scénario pour commencer :</p>
+        <div class="scenario-grid">
+          <div class="scenario-card" onclick="startConversation('professeur')" style="border-color:var(--terracotta);background:linear-gradient(135deg,#fff 80%,rgba(192,113,79,.06))">
+            <span class="scenario-icon">👨‍🏫</span>
+            <div class="scenario-name" style="color:var(--terracotta)">Professeur</div>
+            <div class="scenario-desc">Guidé et corrigé — idéal pour apprendre</div>
+          </div>
+          <div class="scenario-card" onclick="startConversation('libre')">
+            <span class="scenario-icon">💬</span>
+            <div class="scenario-name">Conversation libre</div>
+            <div class="scenario-desc">Parlez de n'importe quel sujet</div>
+          </div>
+          <div class="scenario-card" onclick="startConversation('restaurant')">
+            <span class="scenario-icon">🍽️</span>
+            <div class="scenario-name">Au restaurant</div>
+            <div class="scenario-desc">Commander, demander l'addition</div>
+          </div>
+          <div class="scenario-card" onclick="startConversation('presentation')">
+            <span class="scenario-icon">👋</span>
+            <div class="scenario-name">Se présenter</div>
+            <div class="scenario-desc">Parler de vous, votre vie</div>
+          </div>
+          <div class="scenario-card" onclick="startConversation('direction')">
+            <span class="scenario-icon">🗺️</span>
+            <div class="scenario-name">Demander son chemin</div>
+            <div class="scenario-desc">Dans la rue, dans Paris</div>
+          </div>
+          <div class="scenario-card" onclick="startConversation('shopping')">
+            <span class="scenario-icon">🛍️</span>
+            <div class="scenario-name">Faire les courses</div>
+            <div class="scenario-desc">Dans un magasin ou marché</div>
+          </div>
+          <div class="scenario-card" onclick="startConversation('medecin')">
+            <span class="scenario-icon">🏥</span>
+            <div class="scenario-name">Chez le médecin</div>
+            <div class="scenario-desc">Décrire vos symptômes</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Conversation view -->
+      <div id="conversation-area" style="display:none">
+        <div class="conv-header">
+          <div class="conv-scenario-badge" id="conv-scenario-badge"></div>
+          <div style="display:flex;gap:.5rem;">
+            <button class="conv-mistakes-btn" onclick="toggleMistakes()" id="mistakes-toggle">📋 Erreurs</button>
+            <button class="conv-end-btn" onclick="endConversation()">✕ Terminer</button>
+          </div>
+        </div>
+
+        <!-- Mistakes panel -->
+        <div id="mistakes-panel" style="display:none">
+          <div class="mistakes-title">Mes erreurs fréquentes</div>
+          <div id="mistakes-list"></div>
+        </div>
+
+        <!-- Chat messages -->
+        <div class="conv-messages" id="conv-messages"></div>
+
+        <!-- Input area -->
+        <div class="conv-input-area">
+          <div class="conv-status" id="conv-status">Maintenez le micro pour parler</div>
+          <div class="conv-controls">
+            <div style="text-align:center;">
+              <button class="mic-btn" id="mic-btn"
+                onmousedown="startListening()" onmouseup="stopListening()"
+                ontouchstart="event.preventDefault();startListening()" ontouchend="event.preventDefault();stopListening()">
+                <span class="mic-icon">🎤</span>
+              </button>
+              <div style="font-size:.7rem;color:var(--muted);margin-top:.5rem;letter-spacing:.04em;">MANTÉN PRESIONADO</div>
+            </div>
+          </div>
+          <div class="conv-transcript" id="conv-transcript"></div>
+        </div>
+      </div>
     </div>
   </main>
   <footer>Daniel apprend le français &nbsp;·&nbsp; espace personnel</footer>
@@ -601,7 +814,10 @@ function logout(){
 if(sessionStorage.getItem('dalf-auth')==='1'){
   document.getElementById('lock-screen').style.display='none';
   document.getElementById('app').style.display='flex';
-  initData();
+  initData().then(()=>{
+    const path = window.location.pathname.replace('/','');
+    if(path && path !== 'index.html') showSection(path);
+  });
 }
 
 /* ════════════════════════════════════════
@@ -611,7 +827,8 @@ async function showSection(name){
   document.getElementById('home-view').style.display='none';
   document.querySelectorAll('.section-view').forEach(v=>v.classList.remove('active'));
   document.getElementById(name+'-view').classList.add('active');
-  if(name==='vocab') renderCards();
+  history.pushState({section:name}, '', '/'+name);
+  if(name==='reading'){ loadNews(); }
   if(name==='grammar'){
     renderCustomCatButtons();
     loadCategory(currentCat);
@@ -622,8 +839,14 @@ async function showSection(name){
 function showHome(){
   document.querySelectorAll('.section-view').forEach(v=>v.classList.remove('active'));
   document.getElementById('home-view').style.display='block';
+  history.pushState({section:'home'}, '', '/');
   updateHomeCount();
 }
+window.addEventListener('popstate', e=>{
+  const section = e.state?.section;
+  if(!section || section==='home') showHome();
+  else showSection(section);
+});
 
 /* ════════════════════════════════════════
    API KEY
@@ -862,7 +1085,12 @@ async function generateExercises(){
   // Use custom cat name if applicable
   const catName = CAT_NAMES[currentCat] || (customCats.find(c=>c.key===currentCat)||{}).name || currentCat;
 
-  const prompt=`Tu es un professeur de français expert. Génère exactement 5 exercices de grammaire française sur le thème : "${catName}". Le niveau est A1-A2 (débutant).
+  // Build vocab context if available
+  const vocabContext = vocab.length > 0
+    ? `\n\nVocabulaire de l'étudiant (utilise ces mots dans les exercices quand c'est pertinent) :\n${vocab.slice(0,30).map(w=>`- ${w.fr} (es: ${w.es}${w.en?' / en: '+w.en:''})`).join('\n')}`
+    : '';
+
+  const prompt=`Tu es un professeur de français expert. Génère exactement 5 exercices de grammaire française sur le thème : "${catName}". Le niveau est A1-A2 (débutant).${vocabContext}
 
 Réponds UNIQUEMENT avec un tableau JSON valide, sans texte avant ou après, sans backticks markdown.
 
@@ -883,7 +1111,7 @@ Format exact :
   }
 ]
 
-Règles : pour mc, answer doit être la copie exacte d'une option. Alterne mc et fill. Feedback en français.`;
+Règles : pour mc, answer doit être la copie exacte d'une option. Alterne mc et fill. Feedback en français. Si tu utilises des mots du vocabulaire de l'étudiant, c'est un plus mais pas obligatoire pour chaque exercice.`;
 
   try {
     const res=await fetch('https://api.anthropic.com/v1/messages',{
@@ -984,6 +1212,558 @@ function updateHomeCount(){
 }
 
 /* ════════════════════════════════════════
+   LECTURE — NEWS
+════════════════════════════════════════ */
+const NEWS_TOPICS = {
+  facile: 'actualités françaises simples pour apprenants de français niveau A1-A2, utilise un vocabulaire simple',
+  france: 'actualités France politique société économie',
+  monde: 'actualités monde international diplomatie',
+  culture: 'actualités culture cinéma musique art France',
+  sport: 'actualités sport football Roland Garros Tour de France',
+};
+
+let currentNewsCategory = 'facile';
+let currentArticle = null;
+let currentPopupWord = null;
+let currentPopupTranslation = null;
+let speechSynth = window.speechSynthesis;
+let isSpeaking = false;
+
+function setNewsCategory(btn){
+  document.querySelectorAll('.news-cat-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  currentNewsCategory = btn.dataset.cat;
+  loadNews();
+}
+
+async function loadNews(){
+  const list = document.getElementById('news-list');
+  const reader = document.getElementById('article-reader');
+  reader.style.display = 'none';
+  list.style.display = 'block';
+  list.innerHTML = `<div class="news-loading"><span class="spin">⟳</span>Chargement des actualités...</div>`;
+
+  try {
+    const apiKey = getApiKey();
+    if(!apiKey){
+      list.innerHTML = `<div class="news-empty">🔑 Clé API Anthropic requise pour charger les actualités.<br><small>Allez dans Grammaire pour l'enregistrer.</small></div>`;
+      return;
+    }
+
+    const topic = NEWS_TOPICS[currentNewsCategory];
+    const today = new Date().toLocaleDateString('fr-FR', {day:'numeric', month:'long', year:'numeric'});
+    const prompt = `Tu es un journaliste français. Génère 6 articles d'actualité réalistes sur le thème : "${topic}". Date : ${today}.
+
+Réponds UNIQUEMENT avec un tableau JSON valide, sans backticks, sans texte avant ou après.
+
+Format :
+[
+  {
+    "source": "Le Monde",
+    "title": "Titre accrocheur en français",
+    "description": "Résumé en 2 phrases simples.",
+    "content": "Article complet de 10-15 phrases en français. Phrases courtes et claires. Vocabulaire niveau A2-B1.",
+    "date": "${today}"
+  }
+]
+
+Sources variées : Le Monde, Le Figaro, France Info, RFI, BFM TV, Libération. Articles réalistes et variés.`;
+
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body: JSON.stringify({model:'claude-haiku-4-5-20251001', max_tokens:3000, messages:[{role:'user', content:prompt}]})
+    });
+
+    const data = await res.json();
+    const text = data.content?.[0]?.text || '';
+    const clean = text.replace(/```json|```/g,'').trim();
+    const articles = JSON.parse(clean);
+    window._newsArticles = articles;
+
+    list.innerHTML = articles.map((a, i) => `
+      <div class="news-card" onclick="openArticle(${i})">
+        <div class="news-card-source">${esc(a.source)}</div>
+        <div class="news-card-title">${esc(a.title)}</div>
+        <div class="news-card-desc">${esc(a.description)}</div>
+        <div class="news-card-footer">
+          <span class="news-card-date">${esc(a.date)}</span>
+          <span class="news-card-read">Lire →</span>
+        </div>
+      </div>`).join('');
+
+  } catch(err){
+    list.innerHTML = `<div class="news-empty">❌ Erreur de chargement. Réessayez.</div>`;
+    console.error(err);
+  }
+}
+
+function openArticle(idx){
+  const a = window._newsArticles[idx];
+  if(!a) return;
+  currentArticle = a;
+
+  document.getElementById('news-list').style.display = 'none';
+  const reader = document.getElementById('article-reader');
+  reader.style.display = 'block';
+
+  document.getElementById('reader-source').textContent = a.source || '';
+  document.getElementById('reader-title').textContent = a.title || '';
+  document.getElementById('reader-body').innerHTML = tokenizeText(a.content || a.description || a.title);
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function closeArticle(){
+  if(isSpeaking){ speechSynth.cancel(); isSpeaking=false; }
+  document.getElementById('article-reader').style.display = 'none';
+  document.getElementById('news-list').style.display = 'block';
+  closePopup();
+}
+
+function tokenizeText(text){
+  // Split into words and punctuation, wrap each word in a span
+  return text.replace(/([a-zA-ZÀ-ÿ'\-]+)/g, (word) => {
+    const clean = word.replace(/['\-]/g, '');
+    if(clean.length < 2) return word;
+    const isSaved = vocab.some(v => v.fr.toLowerCase().includes(word.toLowerCase()));
+    return `<span class="reader-word${isSaved?' saved':''}" onclick="lookupWord('${esc(word)}')">${word}</span>`;
+  });
+}
+
+async function lookupWord(word){
+  // Clean the word
+  word = word.replace(/[.,!?;:"""''()\[\]]/g, '').trim();
+  if(!word || word.length < 2) return;
+
+  currentPopupWord = word;
+  currentPopupTranslation = null;
+
+  // Show popup
+  document.getElementById('popup-fr').textContent = word;
+  document.getElementById('popup-es').innerHTML = '<span class="popup-loading">traduciendo...</span>';
+  document.getElementById('popup-save').disabled = false;
+  document.getElementById('popup-save').textContent = '➕ Guardar en vocab';
+
+  // Check if already saved
+  const existing = vocab.find(v => v.fr.toLowerCase() === word.toLowerCase());
+  if(existing){
+    document.getElementById('popup-es').textContent = existing.es + (existing.en ? ' / ' + existing.en : '');
+    document.getElementById('popup-save').textContent = '✓ Ya guardado';
+    document.getElementById('popup-save').disabled = true;
+    currentPopupTranslation = existing.es;
+  } else {
+    // Translate via Claude
+    showWordPopup();
+    try {
+      const apiKey = getApiKey();
+      if(!apiKey) {
+        document.getElementById('popup-es').textContent = '(necesitas la clave API para traducir)';
+        return;
+      }
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method:'POST',
+        headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+        body: JSON.stringify({
+          model:'claude-haiku-4-5-20251001',
+          max_tokens:60,
+          messages:[{role:'user', content:`Traduce la palabra francesa "${word}" al español. Responde SOLO con la traducción, sin explicaciones, sin artículos, máximo 4 palabras.`}]
+        })
+      });
+      const data = await res.json();
+      const translation = data.content?.[0]?.text?.trim() || '?';
+      currentPopupTranslation = translation;
+      document.getElementById('popup-es').textContent = translation;
+    } catch(e){
+      document.getElementById('popup-es').textContent = '(error de traducción)';
+    }
+  }
+
+  showWordPopup();
+}
+
+function showWordPopup(){
+  document.getElementById('word-popup').style.display = 'block';
+  document.getElementById('popup-overlay').style.display = 'block';
+}
+
+function closePopup(){
+  document.getElementById('word-popup').style.display = 'none';
+  document.getElementById('popup-overlay').style.display = 'none';
+  currentPopupWord = null;
+  currentPopupTranslation = null;
+}
+
+function savePopupWord(){
+  if(!currentPopupWord || !currentPopupTranslation) return;
+  // Check not already saved
+  if(vocab.some(v => v.fr.toLowerCase() === currentPopupWord.toLowerCase())){
+    showToast('Ya está en tu vocabulario!');
+    closePopup();
+    return;
+  }
+  vocab.push({id:Date.now(), fr:currentPopupWord, es:currentPopupTranslation, en:''});
+  saveVocab();
+  updateHomeCount();
+  // Mark word as saved in reader
+  document.querySelectorAll('.reader-word').forEach(el=>{
+    if(el.textContent.toLowerCase() === currentPopupWord.toLowerCase()){
+      el.classList.add('saved');
+    }
+  });
+  document.getElementById('popup-save').textContent = '✓ Guardado!';
+  document.getElementById('popup-save').disabled = true;
+  showToast(`✓ "${currentPopupWord}" ajouté au vocabulaire !`);
+  setTimeout(closePopup, 800);
+}
+
+function listenArticle(){
+  if(!currentArticle) return;
+  const btn = document.getElementById('listen-btn');
+  if(isSpeaking){
+    speechSynth.cancel();
+    isSpeaking = false;
+    btn.textContent = '🔊 Écouter';
+    btn.classList.remove('playing');
+    return;
+  }
+  const text = currentArticle.title + '. ' + (currentArticle.description || '');
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = 'fr-FR';
+  utt.rate = 0.85;
+  const voice = selectedVoice || getBestFrenchVoice();
+  if(voice) utt.voice = voice;
+  utt.onend = () => { isSpeaking=false; btn.textContent='🔊 Écouter'; btn.classList.remove('playing'); };
+  utt.onerror = () => { isSpeaking=false; btn.textContent='🔊 Écouter'; btn.classList.remove('playing'); };
+  speechSynth.speak(utt);
+  isSpeaking = true;
+  btn.textContent = '⏹ Arrêter';
+  btn.classList.add('playing');
+}
+
+/* ════════════════════════════════════════
+   CONVERSATION
+════════════════════════════════════════ */
+const SCENARIOS = {
+  professeur:   { label:'👨‍🏫 Professeur',            prompt:`Tu es un professeur de français bienveillant et patient. Ton élève parle espagnol (langue maternelle) et apprend le français niveau A1-A2. Ton objectif est de l'ENSEIGNER, pas juste de converser.
+
+RÈGLES STRICTES :
+- Si l'élève dit quelque chose en espagnol ou en anglais, dis-lui : "En espagnol tu dis '[mot]', en français on dit '[traduction]'. Répète : '[traduction]'" puis repose la question.
+- Si la phrase est incorrecte, explique l'erreur clairement et simplement, donne la version correcte, et demande de répéter.
+- Si la phrase est correcte mais peut être améliorée, félicite d'abord puis montre comment dire mieux.
+- Pose UNE question à la fois. Attends la réponse avant de continuer.
+- Commence par une introduction simple et pose une première question facile.
+- Sois très encourageant : "Très bien !", "Bravo !", "Presque !", "Bonne tentative !"` },
+  libre:        { label:'💬 Conversation libre',   prompt:'Tu es un ami français sympathique. Parle naturellement avec l\'utilisateur sur n\'importe quel sujet. Niveau A1-A2.' },
+  restaurant:   { label:'🍽️ Au restaurant',        prompt:'Tu es un serveur dans un bistrot parisien. Accueille le client, prends sa commande, réponds à ses questions. Sois poli et typiquement français.' },
+  presentation: { label:'👋 Se présenter',          prompt:'Tu rencontres quelqu\'un pour la première fois. Présente-toi et pose des questions pour apprendre à te connaître. Sois chaleureux.' },
+  direction:    { label:'🗺️ Demander son chemin',   prompt:'Tu es un passant parisien. L\'utilisateur te demande son chemin. Donne des directions claires avec des repères réels de Paris.' },
+  shopping:     { label:'🛍️ Faire les courses',     prompt:'Tu es un vendeur dans un marché ou magasin français. Aide le client à trouver des produits, donne les prix, sois commerçant.' },
+  medecin:      { label:'🏥 Chez le médecin',       prompt:'Tu es un médecin généraliste français. Accueille ton patient, pose des questions sur ses symptômes, donne des conseils simples.' },
+};
+
+let convHistory = [];
+let convScenario = null;
+let mistakeLog = [];
+let recognition = null;
+let isListening = false;
+let convSpeaking = false;
+
+async function startConversation(scenarioKey){
+  convScenario = SCENARIOS[scenarioKey];
+  convHistory = [];
+
+  document.getElementById('scenario-picker').style.display = 'none';
+  document.getElementById('conversation-area').style.display = 'block';
+  document.getElementById('conv-scenario-badge').textContent = convScenario.label;
+  document.getElementById('conv-messages').innerHTML = '';
+  document.getElementById('conv-transcript').textContent = '';
+  document.getElementById('mistakes-panel').style.display = 'none';
+
+  // Load mistake log from Firebase
+  mistakeLog = await fbLoad('mistakeLog', []);
+  renderMistakes();
+
+  // Build voice picker (voices may load async)
+  if(speechSynth.getVoices().length) buildVoicePicker();
+  else speechSynth.onvoiceschanged = buildVoicePicker;
+
+  // Claude opens the conversation
+  setConvStatus('Claude prépare la conversation...');
+  await claudeRespond('[START]');
+}
+
+function endConversation(){
+  if(recognition) recognition.stop();
+  if(convSpeaking) speechSynth.cancel();
+  document.getElementById('conversation-area').style.display = 'none';
+  document.getElementById('scenario-picker').style.display = 'block';
+  convHistory = [];
+  setConvStatus('Appuyez sur le micro pour parler');
+}
+
+function toggleMistakes(){
+  const panel = document.getElementById('mistakes-panel');
+  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+}
+
+function renderMistakes(){
+  const list = document.getElementById('mistakes-list');
+  if(!mistakeLog.length){
+    list.innerHTML = '<div class="mistakes-empty">Aucune erreur enregistrée pour l\'instant — continuez à pratiquer !</div>';
+    return;
+  }
+  // Group by type
+  const grouped = {};
+  mistakeLog.forEach(m => {
+    if(!grouped[m.type]) grouped[m.type] = [];
+    grouped[m.type].push(m);
+  });
+  list.innerHTML = Object.entries(grouped).map(([type, items]) => `
+    <div class="mistake-item">
+      <div class="mistake-type">${esc(type)} <span class="mistake-count">${items.length}×</span></div>
+      <div>${esc(items[items.length-1].correction)}</div>
+    </div>`).join('');
+}
+
+/* ── Speech Recognition ── */
+function startListening(){
+  if(isListening) return;
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SpeechRecognition){
+    showToast('Reconnaissance vocale non supportée sur ce navigateur.');
+    return;
+  }
+  // Stop any ongoing speech
+  if(convSpeaking) speechSynth.cancel();
+
+  recognition = new SpeechRecognition();
+  recognition.lang = 'fr-FR';
+  recognition.continuous = true;
+  recognition.interimResults = true;
+
+  recognition.onstart = () => {
+    isListening = true;
+    document.getElementById('mic-btn').classList.add('listening');
+    setConvStatus('Je vous écoute... 🎤');
+    document.getElementById('conv-transcript').textContent = '';
+  };
+
+  recognition.onresult = (e) => {
+    const transcript = Array.from(e.results).map(r => r[0].transcript).join('');
+    document.getElementById('conv-transcript').textContent = transcript;
+  };
+
+  recognition.onerror = (e) => {
+    isListening = false;
+    document.getElementById('mic-btn').classList.remove('listening');
+    if(e.error === 'not-allowed') showToast('Accès au micro refusé. Autorisez le micro dans les paramètres.');
+    else if(e.error !== 'aborted') setConvStatus('Erreur micro — réessayez');
+  };
+
+  recognition.start();
+}
+
+async function stopListening(){
+  if(!isListening) return;
+  isListening = false;
+  document.getElementById('mic-btn').classList.remove('listening');
+  if(recognition) recognition.stop();
+
+  // Small delay to get final transcript
+  await new Promise(r => setTimeout(r, 300));
+  const transcript = document.getElementById('conv-transcript').textContent.trim();
+
+  if(transcript){
+    document.getElementById('conv-transcript').textContent = '';
+    addMessage('user', transcript);
+    document.getElementById('mic-btn').classList.add('loading');
+    setConvStatus('Claude réfléchit...');
+    await claudeRespond(transcript);
+    document.getElementById('mic-btn').classList.remove('loading');
+    setConvStatus('Maintenez le micro pour parler');
+  } else {
+    setConvStatus('Rien entendu — réessayez');
+  }
+}
+
+/* ── Claude Response ── */
+async function claudeRespond(userText){
+  const apiKey = getApiKey();
+  if(!apiKey){ showToast('Clé API requise !'); return; }
+
+  const isStart = userText === '[START]';
+
+  const systemPrompt = `${convScenario.prompt}
+
+RÈGLES IMPORTANTES :
+1. Réponds TOUJOURS en JSON valide, sans backticks, format exact :
+{"reply": "ta réponse en français", "correction": null}
+ou si l'utilisateur a fait une erreur :
+{"reply": "ta réponse en français", "correction": {"type": "type d'erreur", "original": "ce qu'il a dit", "correct": "la version correcte", "explanation": "explication courte en français"}}
+
+2. Ta réponse ("reply") doit être naturelle, courte (2-4 phrases max), dans le contexte du scénario.
+3. Ne corrige PAS chaque petite erreur — seulement les erreurs importantes de grammaire ou vocabulaire.
+4. Si c'est le début ([START]), commence la conversation de façon naturelle selon le scénario.
+5. Sois encourageant et bienveillant.`;
+
+  const messages = isStart
+    ? [{role:'user', content:'[START] Commence la conversation.'}]
+    : [...convHistory.map(m => ({role: m.role, content: m.content})), {role:'user', content: userText}];
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body: JSON.stringify({
+        model:'claude-haiku-4-5-20251001',
+        max_tokens:400,
+        system: systemPrompt,
+        messages
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.[0]?.text || '{}';
+    const parsed = JSON.parse(text.replace(/```json|```/g,'').trim());
+
+    const reply = parsed.reply || '...';
+    const correction = parsed.correction || null;
+
+    // Add user message with correction if any
+    if(!isStart && correction){
+      addMessageWithCorrection('user-corrected', userText, correction);
+      // Save mistake
+      mistakeLog.push({
+        type: correction.type,
+        original: correction.original,
+        correction: `${correction.correct} — ${correction.explanation}`,
+        date: new Date().toISOString()
+      });
+      // Keep only last 50 mistakes
+      if(mistakeLog.length > 50) mistakeLog = mistakeLog.slice(-50);
+      fbSave('mistakeLog', mistakeLog);
+      renderMistakes();
+    }
+
+    // Add Claude's reply
+    addMessage('claude', reply);
+
+    // Update history
+    if(!isStart) convHistory.push({role:'user', content:userText});
+    convHistory.push({role:'assistant', content:reply});
+    // Keep history manageable
+    if(convHistory.length > 20) convHistory = convHistory.slice(-20);
+
+    // Auto-speak Claude's reply
+    speakText(reply);
+
+  } catch(err){
+    console.error(err);
+    addMessage('claude', 'Désolé, une erreur s\'est produite. Réessayez !');
+    setConvStatus('Appuyez sur le micro pour parler');
+  }
+}
+
+/* ── Message rendering ── */
+function addMessage(role, text){
+  const el = document.createElement('div');
+  el.className = `conv-msg ${role}`;
+  el.innerHTML = `<div>${esc(text)}</div>`;
+  if(role === 'claude'){
+    const ttsBtn = document.createElement('button');
+    ttsBtn.className = 'conv-msg-tts';
+    ttsBtn.textContent = '🔊 Écouter';
+    ttsBtn.onclick = () => speakText(text);
+    el.appendChild(ttsBtn);
+  }
+  const msgs = document.getElementById('conv-messages');
+  msgs.appendChild(el);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function addMessageWithCorrection(role, text, correction){
+  const el = document.createElement('div');
+  el.className = 'conv-msg user';
+  el.innerHTML = `
+    <div class="msg-original">${esc(text)}</div>
+    <div class="conv-msg-correction">
+      <strong>✗ Correction :</strong> ${esc(correction.correct)}<br>
+      <em>${esc(correction.explanation)}</em>
+    </div>`;
+  const msgs = document.getElementById('conv-messages');
+  msgs.appendChild(el);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+/* ── TTS ── */
+let selectedVoice = null;
+
+function getBestFrenchVoice(){
+  const voices = speechSynth.getVoices();
+  // Priority order: native French voices
+  const priorities = [
+    v => v.lang === 'fr-FR' && !v.localService === false, // online fr-FR first
+    v => v.lang === 'fr-FR',
+    v => v.lang === 'fr-CA',
+    v => v.lang === 'fr-BE',
+    v => v.lang === 'fr-CH',
+    v => v.lang.startsWith('fr'),
+  ];
+  for(const check of priorities){
+    const match = voices.find(check);
+    if(match) return match;
+  }
+  return null;
+}
+
+function speakText(text){
+  if(!speechSynth) return;
+  speechSynth.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = 'fr-FR';
+  utt.rate = 0.82;
+  utt.pitch = 1.0;
+  const voice = selectedVoice || getBestFrenchVoice();
+  if(voice) utt.voice = voice;
+  speechSynth.speak(utt);
+}
+
+function buildVoicePicker(){
+  const voices = speechSynth.getVoices().filter(v => v.lang.startsWith('fr'));
+  if(!voices.length) return;
+  const existing = document.getElementById('voice-picker-row');
+  if(existing) existing.remove();
+  const row = document.createElement('div');
+  row.id = 'voice-picker-row';
+  row.style.cssText = 'margin-top:.7rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;';
+  row.innerHTML = `<span style="font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);">Voix :</span>`;
+  voices.forEach((v, i) => {
+    const btn = document.createElement('button');
+    btn.textContent = v.name.replace('(fr','').replace(')','').trim();
+    btn.style.cssText = 'padding:.28rem .65rem;border:1.5px solid var(--parchment);border-radius:20px;background:#fff;font-family:Lato,sans-serif;font-size:.72rem;cursor:pointer;color:var(--muted);';
+    btn.onclick = () => {
+      selectedVoice = v;
+      document.querySelectorAll('#voice-picker-row button').forEach(b => {
+        b.style.background='#fff'; b.style.color='var(--muted)'; b.style.borderColor='var(--parchment)';
+      });
+      btn.style.background='var(--moss)'; btn.style.color='#fff'; btn.style.borderColor='var(--moss)';
+      speakText('Bonjour, je suis votre assistant français !');
+    };
+    if(i===0){
+      selectedVoice = v;
+      btn.style.background='var(--moss)'; btn.style.color='#fff'; btn.style.borderColor='var(--moss)';
+    }
+    row.appendChild(btn);
+  });
+  // Attach below conv input area
+  const inputArea = document.getElementById('conv-input-area') || document.querySelector('.conv-input-area');
+  if(inputArea) inputArea.appendChild(row);
+}
+
+function setConvStatus(msg){
+  document.getElementById('conv-status').textContent = msg;
+}
+
+/* ════════════════════════════════════════
    UTILITIES
 ════════════════════════════════════════ */
 let toastTimer;
@@ -1015,10 +1795,21 @@ window.deleteWord = deleteWord;
 window.shuffleCards = shuffleCards;
 window.setDisplayLang = setDisplayLang;
 window.flipCard = flipCard;
+window.startConversation = startConversation;
+window.endConversation = endConversation;
+window.startListening = startListening;
+window.stopListening = stopListening;
+window.toggleMistakes = toggleMistakes;
 window.fbSave = fbSave;
 window.fbLoad = fbLoad;
+window.setNewsCategory = setNewsCategory;
+window.loadNews = loadNews;
+window.openArticle = openArticle;
+window.closeArticle = closeArticle;
+window.lookupWord = lookupWord;
+window.savePopupWord = savePopupWord;
+window.closePopup = closePopup;
+window.listenArticle = listenArticle;
 </script>
 </body>
 </html>
-
-
