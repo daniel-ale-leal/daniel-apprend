@@ -363,7 +363,7 @@
 <!-- APP -->
 <div id="app">
   <header>
-    <div class="header-left">
+    <div class="header-left" onclick="showHome()" style="cursor:pointer;" title="Accueil">
       <span class="header-flag">🇫🇷</span>
       <div class="header-title"><span>Daniel</span> apprend le français</div>
     </div>
@@ -1550,13 +1550,16 @@ function startListening(){
   };
 
   recognition.onresult = (e) => {
-    // Use only the most recent result to avoid rewriting
-    let transcript = '';
-    for(let i = e.resultIndex; i < e.results.length; i++){
-      transcript += e.results[i][0].transcript;
+    let finalText = '';
+    let interimText = '';
+    for(let i = 0; i < e.results.length; i++){
+      if(e.results[i].isFinal){
+        finalText += e.results[i][0].transcript + ' ';
+      } else {
+        interimText += e.results[i][0].transcript;
+      }
     }
-    const current = document.getElementById('conv-transcript').textContent;
-    document.getElementById('conv-transcript').textContent = (current + ' ' + transcript).trim();
+    document.getElementById('conv-transcript').textContent = (finalText + interimText).trim();
   };
 
   recognition.onerror = (e) => {
