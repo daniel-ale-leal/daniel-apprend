@@ -251,7 +251,18 @@
   .popup-close-btn{padding:.5rem .8rem;background:var(--cream);border:1.5px solid var(--parchment);border-radius:8px;font-family:'Lato',sans-serif;font-size:.82rem;cursor:pointer;}
 
   /* ── CONVERSATION SECTION ── */
-  .scenario-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:.9rem;margin-bottom:1.5rem;}
+  .scenario-grid{display:none;}
+  .marcel-setup{background:#fff;border:1.5px solid var(--parchment);border-radius:16px;padding:1.8rem;max-width:560px;}
+  .marcel-setup-header{display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;}
+  .marcel-setup-form{display:flex;flex-direction:column;gap:1rem;}
+  .setup-group{display:flex;flex-direction:column;gap:.4rem;}
+  .setup-label{font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
+  .setup-select,.setup-input{padding:.65rem .9rem;border:1.5px solid var(--parchment);border-radius:8px;font-family:'Lato',sans-serif;font-size:.93rem;color:var(--ink);background:var(--cream);outline:none;transition:border-color .2s;width:100%;}
+  .setup-select:focus,.setup-input:focus{border-color:var(--fern);}
+  .setup-or{text-align:center;font-size:.78rem;color:var(--muted);font-style:italic;}
+  .setup-start-btn{padding:.8rem;background:var(--terracotta);color:#fff;border:none;border-radius:10px;font-family:'Lato',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;transition:background .2s;margin-top:.5rem;}
+  .setup-start-btn:hover{background:var(--clay);}
+  @media(max-width:600px){.marcel-setup-header{flex-direction:column;text-align:center;}}
   .scenario-card{background:#fff;border:1.5px solid var(--parchment);border-radius:14px;padding:1.2rem 1rem;cursor:pointer;transition:transform .18s,box-shadow .18s,border-color .18s;text-align:center;}
   .scenario-card:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(44,36,24,.1);border-color:var(--sage);}
   .scenario-icon{font-size:1.8rem;display:block;margin-bottom:.5rem;}
@@ -603,14 +614,57 @@
 
       <!-- Scenario picker -->
       <div id="scenario-picker">
-        <div style="text-align:center;padding:2rem 1rem;">
-          <div style="font-size:3rem;margin-bottom:1rem;">🥐</div>
-          <div style="font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--moss);margin-bottom:.5rem;">Marcel est prêt !</div>
-          <div style="font-size:.9rem;color:var(--muted);margin-bottom:1.5rem;">Il vous demandera ce que vous voulez pratiquer.</div>
-          <button onclick="startConversation()" style="padding:.8rem 2rem;background:var(--terracotta);color:#fff;border:none;border-radius:10px;font-family:'Lato',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;">Commencer →</button>
+        <div class="marcel-setup">
+          <div class="marcel-setup-header">
+            <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style="width:80px;height:80px;filter:drop-shadow(0 3px 8px rgba(200,130,42,.2))">
+              <ellipse cx="100" cy="120" rx="62" ry="38" fill="#c8822a"/>
+              <path d="M 50 115 Q 60 60 100 58 Q 140 60 150 115" fill="#d4921f"/>
+              <path d="M 55 118 Q 65 72 100 70 Q 135 72 145 118" fill="none" stroke="#b8711a" stroke-width="3" stroke-linecap="round"/>
+              <path d="M 50 115 Q 28 108 22 118 Q 20 128 38 130 Q 48 126 55 120" fill="#c8822a"/>
+              <path d="M 150 115 Q 172 108 178 118 Q 180 128 162 130 Q 152 126 145 120" fill="#c8822a"/>
+              <ellipse cx="88" cy="88" rx="18" ry="10" fill="#e8a84a" opacity="0.5" transform="rotate(-20 88 88)"/>
+              <circle cx="86" cy="105" r="5" fill="#3d2006"/>
+              <circle cx="114" cy="105" r="5" fill="#3d2006"/>
+              <circle cx="88" cy="103.5" r="1.8" fill="white"/>
+              <circle cx="116" cy="103.5" r="1.8" fill="white"/>
+              <path d="M 90 118 Q 100 124 110 118" fill="none" stroke="#3d2006" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M 80 98 Q 87 95 93 98" fill="none" stroke="#3d2006" stroke-width="2" stroke-linecap="round"/>
+              <path d="M 107 98 Q 113 95 120 98" fill="none" stroke="#3d2006" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <div>
+              <div style="font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--moss);font-weight:700;">Bonjour ! Je suis Marcel</div>
+              <div style="font-size:.85rem;color:var(--muted);">Que voulez-vous pratiquer aujourd'hui ?</div>
+            </div>
+          </div>
+
+          <div class="marcel-setup-form">
+            <div class="setup-group">
+              <label class="setup-label">Choisissez un sujet</label>
+              <select id="topic-select" class="setup-select">
+                <option value="">— Sélectionnez —</option>
+                <option value="Se présenter et parler de soi">Se présenter</option>
+                <option value="Au restaurant — commander et demander l'addition">Au restaurant</option>
+                <option value="Demander son chemin dans Paris">Demander son chemin</option>
+                <option value="Faire les courses au marché">Faire les courses</option>
+                <option value="Chez le médecin — décrire ses symptômes">Chez le médecin</option>
+                <option value="Parler de sa famille">Parler de sa famille</option>
+                <option value="Réserver un hôtel ou un Airbnb">Réserver un hébergement</option>
+                <option value="Parler de ses activités et hobbies">Activités et hobbies</option>
+                <option value="Conversation libre sur n'importe quel sujet">Conversation libre</option>
+              </select>
+            </div>
+
+            <div class="setup-or">ou</div>
+
+            <div class="setup-group">
+              <label class="setup-label">Écrivez votre propre sujet</label>
+              <input id="topic-custom" class="setup-input" type="text" placeholder="ex: parler de mon travail, les vacances, la météo…"/>
+            </div>
+
+            <button onclick="startConversation()" class="setup-start-btn">Commencer avec Marcel →</button>
+          </div>
         </div>
       </div>
-
       <!-- Conversation view -->
       <div id="conversation-area" style="display:none">
         <div class="conv-header">
@@ -1496,11 +1550,20 @@ let isListening = false;
 let convSpeaking = false;
 
 async function startConversation(){
+  // Get topic from dropdown or custom input
+  const select = document.getElementById('topic-select');
+  const custom = document.getElementById('topic-custom');
+  const topic = (custom.value.trim()) || (select.value) || 'conversation libre';
+
   convHistory = [];
+
+  // Build prompt with the chosen topic
+  const topicPrompt = MARCEL_PROMPT + `\n\nSujet choisi pour cette session : "${topic}". Commence directement sur ce sujet sans redemander.`;
+  convScenario = { label: '👨‍🏫 Marcel', prompt: topicPrompt };
 
   document.getElementById('scenario-picker').style.display = 'none';
   document.getElementById('conversation-area').style.display = 'block';
-  document.getElementById('conv-scenario-badge').textContent = '👨‍🏫 Marcel';
+  document.getElementById('conv-scenario-badge').textContent = '👨‍🏫 ' + topic;
   document.getElementById('conv-messages').innerHTML = '';
   document.getElementById('conv-transcript').textContent = '';
   document.getElementById('mistakes-panel').style.display = 'none';
@@ -1965,6 +2028,10 @@ window.shuffleCards = shuffleCards;
 window.setDisplayLang = setDisplayLang;
 window.flipCard = flipCard;
 window.startConversation = startConversation;
+// Allow Enter in custom topic to start
+document.addEventListener('keydown', e => {
+  if(e.key === 'Enter' && document.activeElement?.id === 'topic-custom') startConversation();
+});
 window.endConversation = endConversation;
 window.toggleListening = toggleListening;
 window.startListening = startListening;
