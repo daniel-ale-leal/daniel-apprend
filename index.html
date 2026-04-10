@@ -1604,7 +1604,8 @@ ou si l'utilisateur a fait une erreur :
 2. Ta réponse ("reply") doit être naturelle, courte (2-4 phrases max), dans le contexte du scénario.
 3. Ne corrige PAS chaque petite erreur — seulement les erreurs importantes de grammaire ou vocabulaire.
 4. Si c'est le début ([START]), commence la conversation de façon naturelle selon le scénario.
-5. Sois encourageant et bienveillant.`;
+5. Sois encourageant et bienveillant.
+6. N'utilise JAMAIS d'emojis dans ta réponse. Texte pur uniquement.`;
 
   const messages = isStart
     ? [{role:'user', content:'[START] Commence la conversation.'}]
@@ -1644,17 +1645,18 @@ ou si l'utilisateur a fait une erreur :
       renderMistakes();
     }
 
-    // Add Claude's reply
-    addMessage('claude', reply);
+    // Strip emojis and add Claude's reply
+    const cleanReply = reply.replace(/[\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}\u{FE00}-\u{FEFF}]/gu, '').trim();
+    addMessage('claude', cleanReply);
 
     // Update history
     if(!isStart) convHistory.push({role:'user', content:userText});
-    convHistory.push({role:'assistant', content:reply});
+    convHistory.push({role:'assistant', content:cleanReply});
     // Keep history manageable
     if(convHistory.length > 20) convHistory = convHistory.slice(-20);
 
     // Auto-speak Claude's reply
-    speakText(reply);
+    speakText(cleanReply);
 
   } catch(err){
     console.error(err);
@@ -1665,15 +1667,20 @@ ou si l'utilisateur a fait une erreur :
 
 /* ── Message rendering ── */
 function addMessage(role, text){
+  // Strip emojis from all messages
+  const clean = text.replace(/[\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}\u{FE00}-\u{FEFF}]/gu, '').trim();
   const el = document.createElement('div');
   el.className = `conv-msg ${role}`;
-  el.innerHTML = `<div>${esc(text)}</div>`;
   if(role === 'claude'){
+    // Make words clickable for translation
+    el.innerHTML = `<div>${tokenizeText(clean)}</div>`;
     const ttsBtn = document.createElement('button');
     ttsBtn.className = 'conv-msg-tts';
-    ttsBtn.textContent = '🔊 Écouter';
-    ttsBtn.onclick = () => speakText(text);
+    ttsBtn.textContent = 'Ecouter';
+    ttsBtn.onclick = () => speakText(clean);
     el.appendChild(ttsBtn);
+  } else {
+    el.innerHTML = `<div>${esc(clean)}</div>`;
   }
   const msgs = document.getElementById('conv-messages');
   msgs.appendChild(el);
