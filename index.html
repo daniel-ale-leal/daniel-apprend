@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daniel apprend le français</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --moss:#4a5c3a; --fern:#6b7f55; --sage:#a3b18a;
+    --cream:#f4efe6; --parchment:#e8dece;
+    --terracotta:#c0714f; --clay:#a05a3c; --soil:#6b3f28;
+    --ink:#2c2418; --muted:#7a6f62;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Lato',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;}
+
+  /* LOCK */
+  #lock-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--cream);background-image:radial-gradient(ellipse at 20% 50%,rgba(163,177,138,.18) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(192,113,79,.12) 0%,transparent 50%);}
+  .lock-card{background:#fff;border:1.5px solid var(--parchment);border-radius:16px;padding:3rem 2.5rem;width:100%;max-width:380px;text-align:center;box-shadow:0 8px 40px rgba(44,36,24,.08);}
+  .lock-flag{font-size:2.8rem;margin-bottom:1rem;display:block;}
+  .lock-title{font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--moss);margin-bottom:.3rem;}
+  .lock-subtitle{font-size:.85rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:2rem;}
+  .lock-input{width:100%;padding:.8rem 1rem;border:1.5px solid var(--parchment);border-radius:8px;font-family:'Lato',sans-serif;font-size:1rem;color:var(--ink);background:var(--cream);outline:none;transition:border-color .2s;text-align:center;letter-spacing:.15em;margin-bottom:1rem;}
+  .lock-input:focus{border-color:var(--fern);}
+  .lock-btn{width:100%;padding:.85rem;background:var(--terracotta);color:#fff;border:none;border-radius:8px;font-family:'Lato',sans-serif;font-size:.95rem;font-weight:700;letter-spacing:.06em;cursor:pointer;transition:background .2s,transform .1s;}
+  .lock-btn:hover{background:var(--clay);} .lock-btn:active{transform:scale(.98);}
+  .lock-error{margin-top:.8rem;font-size:.82rem;color:var(--terracotta);min-height:1.2em;}
+
+  /* APP SHELL */
+  #app{display:none;min-height:100vh;flex-direction:column;}
+  header{background:var(--moss);color:var(--cream);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 12px rgba(44,36,24,.15);position:sticky;top:0;z-index:100;}
+  .header-left{display:flex;align-items:center;gap:.75rem;}
+  .header-flag{font-size:1.5rem;}
+  .header-title{font-family:'Playfair Display',serif;font-size:1.25rem;font-style:italic;color:var(--sage);}
+  .header-title span{color:var(--cream);font-style:normal;font-weight:700;}
+  .logout-btn{background:none;border:1px solid rgba(163,177,138,.4);color:var(--sage);padding:.35rem .9rem;border-radius:20px;font-size:.78rem;letter-spacing:.06em;cursor:pointer;transition:all .2s;font-family:'Lato',sans-serif;}
+  .logout-btn:hover{background:rgba(163,177,138,.15);color:var(--cream);}
+  main{flex:1;padding:2.5rem 2rem;max-width:960px;margin:0 auto;width:100%;}
+
+  /* HOME */
+  .welcome-banner{margin-bottom:2.5rem;}
+  .welcome-banner h1{font-family:'Playfair Display',serif;font-size:2rem;color:var(--moss);margin-bottom:.4rem;}
+  .welcome-banner p{color:var(--muted);font-size:.95rem;line-height:1.6;}
+  .level-badge{display:inline-block;background:var(--parchment);color:var(--soil);font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.25rem .7rem;border-radius:20px;margin-top:.6rem;border:1px solid rgba(107,63,40,.15);}
+  .section-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.25rem;}
+  .section-card{background:#fff;border:1.5px solid var(--parchment);border-radius:14px;padding:1.6rem 1.5rem;cursor:pointer;transition:transform .18s,box-shadow .18s,border-color .18s;position:relative;overflow:hidden;}
+  .section-card::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--card-accent,var(--terracotta));border-radius:14px 0 0 14px;}
+  .section-card:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(44,36,24,.1);border-color:var(--card-accent,var(--terracotta));}
+  .card-icon{font-size:1.8rem;margin-bottom:.8rem;display:block;}
+  .card-title{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--ink);margin-bottom:.35rem;}
+  .card-desc{font-size:.83rem;color:var(--muted);line-height:1.5;}
+  .card-count{display:inline-block;margin-top:.7rem;font-size:.75rem;font-weight:700;color:var(--fern);background:rgba(107,127,85,.1);padding:.2rem .6rem;border-radius:10px;}
+  .card-coming-soon{display:inline-block;margin-top:.7rem;font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);background:var(--parchment);padding:.2rem .55rem;border-radius:10px;}
+
+  /* SECTION SHELL */
+  .section-view{display:none;} .section-view.active{display:block;}
+  .back-btn{display:inline-flex;align-items:center;gap:.4rem;background:none;border:none;color:var(--fern);font-family:'Lato',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;letter-spacing:.05em;padding:0 0 1.5rem 0;transition:color .15s;}
+  .back-btn:hover{color:var(--moss);}
+  .section-header{display:flex;align-items:center;gap:.8rem;margin-bottom:1.5rem;}
+  .section-header-icon{font-size:2rem;}
+  .section-header h2{font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--moss);}
+  .placeholder-box{background:#fff;border:1.5px dashed var(--parchment);border-radius:14px;padding:3rem 2rem;text-align:center;}
+  .placeholder-box p{color:var(--muted);font-size:.9rem;line-height:1.7;}
+  .placeholder-box strong{display:block;font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--fern);margin-bottom:.5rem;}
+
+  /* VOCAB */
+  .vocab-form{background:#fff;border:1.5px solid var(--parchment);border-radius:14px;padding:1.5rem;margin-bottom:2rem;}
+  .vocab-form h3{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--moss);margin-bottom:1.1rem;}
+  .form-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:.75rem;align-items:end;}
+  @media(max-width:640px){.form-row{grid-template-columns:1fr 1fr;} .form-row .add-btn{grid-column:span 2;}}
+  .form-group{display:flex;flex-direction:column;gap:.3rem;}
+  .form-group label{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
+  .form-input{padding:.65rem .85rem;border:1.5px solid var(--parchment);border-radius:8px;font-family:'Lato',sans-serif;font-size:.93rem;color:var(--ink);background:var(--cream);outline:none;transition:border-color .2s;}
+  .form-input:focus{border-color:var(--fern);} .form-input::placeholder{color:#bbb;}
+  .add-btn{padding:.65rem 1.3rem;background:var(--terracotta);color:#fff;border:none;border-radius:8px;font-family:'Lato',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;transition:background .2s,transform .1s;white-space:nowrap;height:fit-content;}
+  .add-btn:hover{background:var(--clay);} .add-btn:active{transform:scale(.97);}
+  .form-optional{font-size:.72rem;color:var(--muted);margin-top:.6rem;font-style:italic;}
+  .vocab-toolbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.25rem;}
+  .toolbar-left{display:flex;align-items:center;gap:.6rem;}
+  .toolbar-label{font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
+  .lang-switcher{display:flex;background:#fff;border:1.5px solid var(--parchment);border-radius:10px;overflow:hidden;}
+  .lang-btn{padding:.4rem .85rem;background:none;border:none;font-family:'Lato',sans-serif;font-size:.8rem;font-weight:700;color:var(--muted);cursor:pointer;transition:all .18s;letter-spacing:.04em;}
+  .lang-btn.active{background:var(--moss);color:#fff;}
+  .lang-btn:not(:last-child){border-right:1.5px solid var(--parchment);}
+  .shuffle-btn{display:flex;align-items:center;gap:.4rem;padding:.4rem 1rem;background:#fff;border:1.5px solid var(--parchment);border-radius:10px;font-family:'Lato',sans-serif;font-size:.8rem;font-weight:700;color:var(--fern);cursor:pointer;transition:all .18s;letter-spacing:.04em;}
+  .shuffle-btn:hover{border-color:var(--fern);background:rgba(107,127,85,.06);}
+  .word-count{font-size:.8rem;color:var(--muted);}
+  .vocab-empty{text-align:center;padding:3rem 1rem;color:var(--muted);}
+  .vocab-empty .empty-icon{font-size:2.5rem;margin-bottom:.8rem;display:block;}
+  .vocab-empty p{font-size:.9rem;line-height:1.6;}
+  .flashcard-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:1rem;}
+  .flashcard{height:148px;perspective:900px;cursor:pointer;}
+  .flashcard-inner{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .46s cubic-bezier(.4,0,.2,1);}
+  .flashcard.flipped .flashcard-inner{transform:rotateY(180deg);}
+  .flashcard-front,.flashcard-back{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1rem;text-align:center;border:1.5px solid var(--parchment);}
+  .flashcard-front{background:#fff;box-shadow:0 3px 14px rgba(44,36,24,.07);transition:border-color .18s,box-shadow .18s;}
+  .flashcard:hover .flashcard-front{border-color:var(--sage);box-shadow:0 6px 22px rgba(44,36,24,.13);}
+  .flashcard-back{background:var(--moss);border-color:var(--moss);transform:rotateY(180deg);box-shadow:0 3px 14px rgba(44,36,24,.18);}
+  .card-front-lang,.card-back-lang{font-size:.64rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--sage);margin-bottom:.35rem;}
+  .card-front-word{font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--ink);font-weight:700;line-height:1.3;}
+  .card-front-hint{font-size:.68rem;color:#ccc;margin-top:.55rem;}
+  .card-back-primary{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--cream);font-weight:700;line-height:1.3;margin-bottom:.25rem;}
+  .card-back-secondary{font-size:.75rem;color:var(--sage);font-style:italic;line-height:1.4;}
+  .card-delete{position:absolute;top:6px;right:7px;background:none;border:none;font-size:.82rem;cursor:pointer;opacity:0;transition:opacity .15s,color .15s;line-height:1;padding:2px;z-index:2;color:#ccc;}
+  .flashcard:hover .card-delete{opacity:1;} .card-delete:hover{color:var(--terracotta)!important;}
+
+  /* ══ GRAMMAR SECTION ══ */
+  .grammar-layout{display:grid;grid-template-columns:220px 1fr;gap:1.5rem;align-items:start;}
+  @media(max-width:700px){.grammar-layout{grid-template-columns:1fr;}}
+
+  /* API key banner */
+
+  /* Category sidebar */
+  .cat-sidebar{background:#fff;border:1.5px solid var(--parchment);border-radius:14px 14px 0 0;overflow:hidden;}
+  .cat-sidebar-outer{border:1.5px solid var(--parchment);border-radius:14px;overflow:hidden;margin-bottom:.75rem;}
+  .cat-sidebar-outer .cat-sidebar{border:none;border-radius:0;}
+  .cat-sidebar-title{padding:.75rem 1rem;font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--parchment);}
+  .cat-btn{display:flex;align-items:center;justify-content:space-between;width:100%;padding:.75rem 1rem;background:none;border:none;border-bottom:1px solid var(--parchment);font-family:'Lato',sans-serif;font-size:.88rem;color:var(--ink);cursor:pointer;text-align:left;transition:background .15s;}
+  .cat-btn:last-child{border-bottom:none;}
+  .cat-btn:hover{background:var(--cream);}
+  .cat-btn.active{background:var(--moss);color:#fff;}
+  .cat-btn.active .cat-count{background:rgba(255,255,255,.25);color:#fff;}
+  .cat-count{font-size:.7rem;background:var(--parchment);color:var(--muted);padding:.15rem .45rem;border-radius:10px;font-weight:700;}
+
+  /* Exercise panel */
+  .exercise-panel{min-width:0;}
+
+  /* Topic header */
+  .topic-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;margin-bottom:1.2rem;}
+  .topic-title{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--moss);}
+  .topic-actions{display:flex;gap:.6rem;flex-wrap:wrap;}
+
+  .gen-btn{display:flex;align-items:center;gap:.4rem;padding:.5rem 1.1rem;background:var(--terracotta);color:#fff;border:none;border-radius:8px;font-family:'Lato',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer;transition:background .2s;}
+  .gen-btn:hover{background:var(--clay);} .gen-btn:disabled{background:#ccc;cursor:not-allowed;}
+  .gen-btn .spin{display:inline-block;animation:spin .7s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .reset-btn{padding:.5rem 1rem;background:#fff;border:1.5px solid var(--parchment);border-radius:8px;font-family:'Lato',sans-serif;font-size:.82rem;font-weight:700;color:var(--muted);cursor:pointer;transition:all .18s;}
+  .reset-btn:hover{border-color:var(--muted);}
+
+  /* Exercise card */
+  .ex-card{background:#fff;border:1.5px solid var(--parchment);border-radius:14px;padding:1.4rem 1.5rem;margin-bottom:1rem;transition:border-color .2s;}
+  .ex-card.answered-correct{border-color:var(--fern);}
+  .ex-card.answered-wrong{border-color:var(--terracotta);}
+  .ex-number{font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;}
+  .ex-question{font-size:1rem;line-height:1.6;color:var(--ink);margin-bottom:1rem;}
+  .ex-question strong{color:var(--moss);}
+  .ex-blank{display:inline-block;border-bottom:2px solid var(--moss);min-width:80px;text-align:center;font-weight:700;color:var(--moss);}
+
+  /* Options (multiple choice) */
+  .ex-options{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.8rem;}
+  @media(max-width:500px){.ex-options{grid-template-columns:1fr;}}
+  .ex-option{padding:.6rem 1rem;background:var(--cream);border:1.5px solid var(--parchment);border-radius:8px;font-family:'Lato',sans-serif;font-size:.9rem;cursor:pointer;text-align:left;transition:all .18s;color:var(--ink);}
+  .ex-option:hover:not(:disabled){border-color:var(--fern);background:#fff;}
+  .ex-option.correct{background:rgba(107,127,85,.12);border-color:var(--fern);color:var(--moss);font-weight:700;}
+  .ex-option.wrong{background:rgba(192,113,79,.1);border-color:var(--terracotta);color:var(--clay);}
+  .ex-option:disabled{cursor:default;}
+
+  /* Fill-in input */
+  .ex-fill-row{display:flex;gap:.5rem;margin-bottom:.8rem;}
+  .ex-fill-input{flex:1;padding:.6rem .9rem;border:1.5px solid var(--parchment);border-radius:8px;font-family:'Lato',sans-serif;font-size:.93rem;color:var(--ink);background:var(--cream);outline:none;transition:border-color .2s;}
+  .ex-fill-input:focus{border-color:var(--fern);}
+  .ex-fill-input.correct{border-color:var(--fern);background:rgba(107,127,85,.08);}
+  .ex-fill-input.wrong{border-color:var(--terracotta);background:rgba(192,113,79,.07);}
+  .ex-submit-btn{padding:.6rem 1.1rem;background:var(--moss);color:#fff;border:none;border-radius:8px;font-family:'Lato',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;white-space:nowrap;}
+  .ex-submit-btn:hover{background:var(--fern);}
+
+  /* Feedback */
+  .ex-feedback{font-size:.85rem;line-height:1.6;padding:.7rem .9rem;border-radius:8px;margin-top:.2rem;}
+  .ex-feedback.correct{background:rgba(107,127,85,.1);color:var(--moss);}
+  .ex-feedback.wrong{background:rgba(192,113,79,.08);color:var(--clay);}
+  .ex-feedback .answer-reveal{font-weight:700;}
+
+  /* Score bar */
+  .score-bar{background:#fff;border:1.5px solid var(--parchment);border-radius:10px;padding:.8rem 1.2rem;margin-bottom:1.2rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;}
+  .score-label{font-size:.8rem;color:var(--muted);font-weight:700;letter-spacing:.05em;}
+  .score-pips{display:flex;gap:.3rem;}
+  .score-pip{width:10px;height:10px;border-radius:50%;background:var(--parchment);}
+  .score-pip.correct{background:var(--fern);}
+  .score-pip.wrong{background:var(--terracotta);}
+  .score-text{font-size:.82rem;color:var(--muted);margin-left:auto;}
+
+  /* Generating loader */
+  .gen-loader{text-align:center;padding:2.5rem 1rem;color:var(--muted);font-size:.9rem;}
+  .gen-loader .loader-icon{font-size:2rem;display:block;margin-bottom:.8rem;animation:spin .9s linear infinite;}
+
+  /* Empty exercise state */
+  .ex-empty{text-align:center;padding:3rem 1rem;color:var(--muted);}
+  .ex-empty .empty-icon{font-size:2.2rem;display:block;margin-bottom:.7rem;}
+
+  /* TOAST */
+  .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(60px);background:var(--moss);color:#fff;padding:.6rem 1.4rem;border-radius:30px;font-size:.85rem;font-weight:700;transition:transform .3s ease;z-index:9999;pointer-events:none;white-space:nowrap;}
+  .toast.show{transform:translateX(-50%) translateY(0);}
+
+  footer{text-align:center;padding:1.5rem;font-size:.78rem;color:var(--parchment);background:var(--soil);letter-spacing:.05em;}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+  .fade-up{animation:fadeUp .4s ease both;}
+  .section-card:nth-child(1){animation-delay:.05s;} .section-card:nth-child(2){animation-delay:.1s;}
+  .section-card:nth-child(3){animation-delay:.15s;} .section-card:nth-child(4){animation-delay:.2s;}
+  .section-card:nth-child(5){animation-delay:.25s;}
+  @keyframes cardPop{from{opacity:0;transform:scale(.91);}to{opacity:1;transform:scale(1);}}
+  .flashcard{animation:cardPop .28s ease both;}
+
+  /* ── MOBILE ── */
+  @media(max-width:600px){
+    header{padding:.7rem 1rem;}
+    .header-title{font-size:.95rem;}
+    .header-flag{font-size:1.2rem;}
+    .logout-btn{padding:.28rem .6rem;font-size:.7rem;}
+    main{padding:1.2rem .9rem;font-size:1.05rem;}
+    .welcome-banner{margin-bottom:1.25rem;}
+    .welcome-banner h1{font-size:1.4rem;}
+    .section-grid{grid-template-columns:1fr 1fr;gap:.7rem;}
+    .section-card{padding:1rem .9rem;}
+    .card-icon{font-size:1.4rem;margin-bottom:.45rem;}
+    .card-title{font-size:1rem;}
+    .card-desc{font-size:.8rem;}
+    .section-header h2{font-size:1.2rem;}
+    .back-btn{padding:0 0 1rem 0;font-size:.82rem;}
+    .vocab-form{padding:1rem;}
+    .vocab-form h3{font-size:.9rem;}
+    .form-row{grid-template-columns:1fr!important;}
+    .form-row .add-btn{grid-column:span 1!important;width:100%;}
+    .vocab-toolbar{gap:.5rem;}
+    .lang-btn{padding:.32rem .6rem;font-size:.74rem;}
+    .shuffle-btn{padding:.32rem .7rem;font-size:.74rem;}
+    .flashcard-grid{grid-template-columns:1fr 1fr;gap:.6rem;}
+    .flashcard{height:118px;}
+    .card-front-word{font-size:1.05rem;}
+    .card-back-primary{font-size:1rem;}
+    .card-front-hint{font-size:.65rem;}
+    .card-back-secondary{font-size:.75rem;}
+    .grammar-layout{gap:.9rem;}
+    .cat-btn{padding:.6rem .8rem;font-size:.82rem;}
+    .ex-card{padding:1rem;}
+    .ex-question{font-size:.98rem;}
+    .ex-option{padding:.5rem .7rem;font-size:.93rem;}
+    .topic-header{flex-direction:column;align-items:flex-start;gap:.5rem;}
+    .topic-actions{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:.4rem;}
+    .gen-btn,.reset-btn{width:100%;justify-content:center;font-size:.78rem;padding:.45rem .6rem;}
+    .score-bar{padding:.55rem .9rem;gap:.5rem;}
+    .score-pip{width:8px;height:8px;}
+    .lock-card{padding:2rem 1.4rem;}
+    .lock-title{font-size:1.3rem;}
+    .cat-sidebar-title{font-size:.65rem;}
+    footer{padding:1rem;font-size:.72rem;}
+  }
+  @media(max-width:380px){
+    .section-grid{grid-template-columns:1fr;}
+    .flashcard-grid{grid-template-columns:1fr 1fr;}
+    .header-title{font-size:.85rem;}
+  }
+</style>
+</head>
+<body>
+<div id="toast" class="toast"></div>
+
+<!-- LOCK -->
+<div id="lock-screen">
+  <div class="lock-card">
+    <span class="lock-flag">🇫🇷</span>
+    <h1 class="lock-title">Daniel apprend le français</h1>
+    <p class="lock-subtitle">espace personnel d'apprentissage</p>
+    <input class="lock-input" type="password" id="pw-input" placeholder="mot de passe" autocomplete="current-password"/>
+    <button class="lock-btn" onclick="checkPassword()">Entrer →</button>
+    <p class="lock-error" id="lock-error"></p>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <header>
+    <div class="header-left">
+      <span class="header-flag">🇫🇷</span>
+      <div class="header-title"><span>Daniel</span> apprend le français</div>
+    </div>
+    <button class="logout-btn" onclick="logout()">← quitter</button>
+  </header>
+
+  <main>
+    <!-- HOME -->
+    <div id="home-view">
+      <div class="welcome-banner fade-up">
+        <h1>Bonjour, Daniel 👋</h1>
+        <p>Choisissez une section pour commencer votre session d'aujourd'hui.</p>
+        <span class="level-badge">Niveau A1–A2</span>
+      </div>
+      <div class="section-grid">
+        <div class="section-card fade-up" style="--card-accent:#c0714f" onclick="showSection('vocab')">
+          <span class="card-icon">📖</span>
+          <div class="card-title">Mon vocabulaire</div>
+          <div class="card-desc">Sauvegardez de nouveaux mots et révisez-les avec des flashcards.</div>
+          <span class="card-count" id="home-word-count">0 mots</span>
+        </div>
+        <div class="section-card fade-up" style="--card-accent:#6b7f55" onclick="showSection('grammar')">
+          <span class="card-icon">✏️</span>
+          <div class="card-title">Grammaire</div>
+          <div class="card-desc">Exercices par catégorie, avec génération IA et exercices de votre livre.</div>
+          <span class="card-count" id="home-grammar-count">7 catégories</span>
+        </div>
+        <div class="section-card fade-up" style="--card-accent:#a3b18a" onclick="showSection('reading')">
+          <span class="card-icon">📰</span>
+          <div class="card-title">Lecture</div>
+          <div class="card-desc">Textes courts avec aide à la compréhension intégrée.</div>
+          <span class="card-coming-soon">bientôt disponible</span>
+        </div>
+        <div class="section-card fade-up" style="--card-accent:#8b6f47" onclick="showSection('listening')">
+          <span class="card-icon">🎧</span>
+          <div class="card-title">Écoute</div>
+          <div class="card-desc">Exercices d'écoute pour entraîner votre oreille au français.</div>
+          <span class="card-coming-soon">bientôt disponible</span>
+        </div>
+        <div class="section-card fade-up" style="--card-accent:#c0714f" onclick="showSection('speaking')">
+          <span class="card-icon">🗣️</span>
+          <div class="card-title">Expression orale</div>
+          <div class="card-desc">Pratiquez la prononciation et l'expression à l'oral.</div>
+          <span class="card-coming-soon">bientôt disponible</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- VOCAB VIEW -->
+    <div id="vocab-view" class="section-view">
+      <button class="back-btn" onclick="showHome()">← retour</button>
+      <div class="section-header">
+        <span class="section-header-icon">📖</span>
+        <h2>Mon vocabulaire</h2>
+      </div>
+      <div class="vocab-form">
+        <h3>✚ Ajouter un mot</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>🇫🇷 Français</label>
+            <input class="form-input" type="text" id="input-fr" placeholder="ex: le chien"/>
+          </div>
+          <div class="form-group">
+            <label>🇪🇸 Español</label>
+            <input class="form-input" type="text" id="input-es" placeholder="ex: el perro"/>
+          </div>
+          <div class="form-group">
+            <label>🇬🇧 English <span style="font-weight:300;text-transform:none;letter-spacing:0">(opcional)</span></label>
+            <input class="form-input" type="text" id="input-en" placeholder="ex: the dog"/>
+          </div>
+          <button class="add-btn" onclick="addWord()">Ajouter →</button>
+        </div>
+        <p class="form-optional">El español es obligatorio · El inglés es opcional</p>
+      </div>
+      <div class="vocab-toolbar">
+        <div class="toolbar-left">
+          <span class="toolbar-label">Voir en :</span>
+          <div class="lang-switcher">
+            <button class="lang-btn active" data-lang="fr" onclick="setDisplayLang('fr')">🇫🇷 FR</button>
+            <button class="lang-btn" data-lang="es" onclick="setDisplayLang('es')">🇪🇸 ES</button>
+            <button class="lang-btn" data-lang="en" onclick="setDisplayLang('en')">🇬🇧 EN</button>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:.75rem;">
+          <span class="word-count" id="word-count-label">0 mots</span>
+          <button class="shuffle-btn" onclick="shuffleCards()">⇄ Mélanger</button>
+        </div>
+      </div>
+      <div id="vocab-cards"></div>
+    </div>
+
+    <!-- GRAMMAR VIEW -->
+    <div id="grammar-view" class="section-view">
+      <button class="back-btn" onclick="showHome()">← retour</button>
+      <div class="section-header">
+        <span class="section-header-icon">✏️</span>
+        <h2>Grammaire</h2>
+      </div>
+<div class="grammar-layout">
+        <!-- Category sidebar -->
+        <div>
+          <div class="cat-sidebar-outer">
+          <div class="cat-sidebar">
+            <div class="cat-sidebar-title">Catégories</div>
+            <button class="cat-btn active" data-cat="passe-compose" onclick="selectCategory(this)">
+              Passé composé <span class="cat-count" id="count-passe-compose">5</span>
+            </button>
+            <button class="cat-btn" data-cat="articles" onclick="selectCategory(this)">
+              Articles <span class="cat-count" id="count-articles">5</span>
+            </button>
+            <button class="cat-btn" data-cat="present" onclick="selectCategory(this)">
+              Présent <span class="cat-count" id="count-present">5</span>
+            </button>
+            <button class="cat-btn" data-cat="negation" onclick="selectCategory(this)">
+              Négation <span class="cat-count" id="count-negation">4</span>
+            </button>
+            <button class="cat-btn" data-cat="questions" onclick="selectCategory(this)">
+              Questions <span class="cat-count" id="count-questions">4</span>
+            </button>
+            <button class="cat-btn" data-cat="imparfait" onclick="selectCategory(this)">
+              Imparfait <span class="cat-count" id="count-imparfait">4</span>
+            </button>
+            <button class="cat-btn" data-cat="prepositions" onclick="selectCategory(this)">
+              Prépositions <span class="cat-count" id="count-prepositions">4</span>
+            </button>
+            <div id="custom-cat-list"></div>
+          </div>
+          </div>
+          <!-- Custom category input -->
+          <div style="margin-top:.75rem;">
+            <div style="font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem;">Nouveau sujet</div>
+            <input id="custom-cat-input" class="form-input" type="text" placeholder="ex: futur simple…" style="font-size:.82rem;padding:.5rem .7rem;width:100%;margin-bottom:.4rem;" onkeydown="if(event.key==='Enter')addCustomCategory()"/>
+            <button onclick="addCustomCategory()" style="width:100%;padding:.5rem;background:var(--moss);color:#fff;border:none;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer;">+ Ajouter</button>
+          </div>
+        </div>
+
+        <!-- Exercise panel -->
+        <div class="exercise-panel">
+          <div class="topic-header">
+            <div class="topic-title" id="topic-title">Passé composé</div>
+            <div class="topic-actions">
+              <button class="gen-btn" id="gen-btn" onclick="generateExercises()">✦ Nouveaux exercices</button>
+              <button class="reset-btn" onclick="resetExercises()">↺ Recommencer</button>
+            </div>
+          </div>
+          <div class="score-bar">
+            <span class="score-label">Progression :</span>
+            <div class="score-pips" id="score-pips"></div>
+            <span class="score-text" id="score-text">0 / 0</span>
+          </div>
+          <div id="exercise-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OTHER SECTIONS -->
+    <div id="reading-view" class="section-view">
+      <button class="back-btn" onclick="showHome()">← retour</button>
+      <div class="section-header"><span class="section-header-icon">📰</span><h2>Lecture</h2></div>
+      <div class="placeholder-box"><strong>Cette section arrive bientôt !</strong><p>Des textes courts avec glossaire intégré seront disponibles ici.</p></div>
+    </div>
+    <div id="listening-view" class="section-view">
+      <button class="back-btn" onclick="showHome()">← retour</button>
+      <div class="section-header"><span class="section-header-icon">🎧</span><h2>Écoute</h2></div>
+      <div class="placeholder-box"><strong>Cette section arrive bientôt !</strong><p>Des exercices d'écoute seront disponibles ici.</p></div>
+    </div>
+    <div id="speaking-view" class="section-view">
+      <button class="back-btn" onclick="showHome()">← retour</button>
+      <div class="section-header"><span class="section-header-icon">🗣️</span><h2>Expression orale</h2></div>
+      <div class="placeholder-box"><strong>Cette section arrive bientôt !</strong><p>Des exercices de prononciation seront disponibles ici.</p></div>
+    </div>
+  </main>
+  <footer>Daniel apprend le français &nbsp;·&nbsp; espace personnel</footer>
+</div>
+
+<script type="module">
+/* ════════════════════════════════════════
+   CONFIG
+════════════════════════════════════════ */
+const PASSWORD = "bonjour";
+
+/* ════════════════════════════════════════
+   BUILT-IN EXERCISE BANK
+   Format: { type:'mc'|'fill', question, options?[], answer, feedback }
+════════════════════════════════════════ */
+const BUILTIN = {
+  "passe-compose": [
+    { type:"mc", question:"Choisissez la forme correcte du passé composé :<br><br><em>Hier, elle ___ au cinéma.</em>", options:["est allée","a allée","était allée","aller"], answer:"est allée", feedback:"✓ Avec les verbes de mouvement (aller, venir, partir…), on utilise <strong>être</strong> comme auxiliaire. Le participe passé s'accorde avec le sujet : <em>elle est allée</em>." },
+    { type:"fill", question:"Complétez avec le passé composé :<br><br>Nous ___ (manger) une bonne pizza hier soir.", answer:"avons mangé", feedback:"✓ <em>Manger</em> → auxiliaire <strong>avoir</strong> + participe passé <strong>mangé</strong>. Avec <em>avoir</em>, le participe ne s'accorde pas avec le sujet." },
+    { type:"mc", question:"Quel auxiliaire utilise-t-on avec <strong>partir</strong> au passé composé ?", options:["avoir","être","aller","faire"], answer:"être", feedback:"✓ <em>Partir</em> fait partie des verbes qui se conjuguent avec <strong>être</strong> au passé composé. Moyen mnémotechnique : DR MRS VANDERTRAMP." },
+    { type:"fill", question:"Conjuguez au passé composé :<br><br>Tu ___ (finir) tes devoirs ?", answer:"as fini", feedback:"✓ <em>Finir</em> → auxiliaire <strong>avoir</strong> + participe passé <strong>fini</strong>. <em>Tu as fini</em> — bonne question !" },
+    { type:"mc", question:"Lequel de ces verbes prend l'auxiliaire <strong>être</strong> au passé composé ?", options:["manger","venir","parler","écouter"], answer:"venir", feedback:"✓ <em>Venir</em> se conjugue avec <strong>être</strong>. Les verbes de déplacement et de changement d'état prennent souvent <em>être</em>." },
+  ],
+  "articles": [
+    { type:"mc", question:"Choisissez l'article correct :<br><br>Je voudrais ___ café, s'il vous plaît.", options:["un","une","le","du"], answer:"un", feedback:"✓ <em>Café</em> est masculin. On utilise <strong>un</strong> (article indéfini masculin) pour une quantité non précisée." },
+    { type:"fill", question:"Complétez avec l'article défini correct :<br><br>J'aime ___ musique classique.", answer:"la", feedback:"✓ <em>Musique</em> est féminin → <strong>la</strong> musique. Les articles définis (le, la, les) s'utilisent pour les choses en général." },
+    { type:"mc", question:"Quel article utilise-t-on devant un mot féminin commençant par une voyelle ?", options:["la","le","l'","une"], answer:"l'", feedback:"✓ Devant une voyelle ou un <em>h</em> muet, <em>la</em> et <em>le</em> s'élident en <strong>l'</strong>. Ex: l'eau, l'heure." },
+    { type:"fill", question:"Mettez l'article partitif correct :<br><br>Elle mange ___ pain tous les matins.", answer:"du", feedback:"✓ <strong>Du</strong> = de + le. Les articles partitifs (du, de la, de l') s'utilisent pour une quantité indéfinie d'une chose non comptable." },
+    { type:"mc", question:"Complétez : <em>Ce sont ___ étudiants sérieux.</em>", options:["des","les","de","un"], answer:"des", feedback:"✓ <strong>Des</strong> est l'article indéfini pluriel, utilisé pour un groupe non spécifique. C'est l'équivalent pluriel de <em>un/une</em>." },
+  ],
+  "present": [
+    { type:"mc", question:"Conjuguez <strong>être</strong> à la 1ère personne du singulier :", options:["je suis","je est","j'ai","je soit"], answer:"je suis", feedback:"✓ Le verbe <em>être</em> est irrégulier : je suis, tu es, il/elle est, nous sommes, vous êtes, ils/elles sont." },
+    { type:"fill", question:"Conjuguez au présent :<br><br>Vous ___ (parler) français très bien !", answer:"parlez", feedback:"✓ Verbes en -ER : pour <em>vous</em>, on ajoute <strong>-ez</strong> au radical. <em>Parl-</em> + <em>-ez</em> = <strong>parlez</strong>." },
+    { type:"mc", question:"Quelle est la forme correcte de <strong>avoir</strong> pour <em>nous</em> ?", options:["nous avons","nous sommes","nous ont","nous avez"], answer:"nous avons", feedback:"✓ <em>Avoir</em> est irrégulier : j'ai, tu as, il a, nous <strong>avons</strong>, vous avez, ils ont." },
+    { type:"fill", question:"Conjuguez au présent :<br><br>Ils ___ (finir) le travail à 18h.", answer:"finissent", feedback:"✓ Verbes en -IR (type finir) : ils/elles + <strong>-issent</strong>. <em>Finiss-</em> + <em>-ent</em> = <strong>finissent</strong>." },
+    { type:"mc", question:"Complétez : <em>Elle ___ une robe rouge.</em>", options:["porte","portez","portent","portes"], answer:"porte", feedback:"✓ Pour <em>il/elle/on</em>, les verbes en -ER prennent la terminaison <strong>-e</strong> (même son que -es)." },
+  ],
+  "negation": [
+    { type:"mc", question:"Transformez en négatif :<br><br><em>Je mange des croissants.</em>", options:["Je ne mange pas des croissants.","Je mange ne pas des croissants.","Je ne mange pas de croissants.","Je pas mange des croissants."], answer:"Je ne mange pas de croissants.", feedback:"✓ La négation encadre le verbe : <strong>ne…pas</strong>. Après la négation, l'article indéfini/partitif devient <strong>de</strong> : <em>des croissants → de croissants</em>." },
+    { type:"fill", question:"Répondez à la négative :<br><br>Tu parles espagnol ? → Non, je ___ parle ___.", answer:"ne / pas", feedback:"✓ La structure est : sujet + <strong>ne</strong> + verbe + <strong>pas</strong>. Devant une voyelle, <em>ne</em> devient <em>n'</em>." },
+    { type:"mc", question:"Quelle phrase est correctement conjuguée à la négative ?", options:["Il n'a pas mangé.","Il a pas mangé.","Il n'a mangé pas.","Il mange ne pas."], answer:"Il n'a pas mangé.", feedback:"✓ Au passé composé, <em>ne…pas</em> encadre l'<strong>auxiliaire</strong> : <em>Il n'<strong>a</strong> pas mangé</em>." },
+    { type:"fill", question:"Complétez :<br><br>Elle ___ aime ___ les légumes. (ne…pas)", answer:"n' / pas", feedback:"✓ Devant une voyelle, <em>ne</em> s'élide en <strong>n'</strong> : <em>elle <strong>n'</strong>aime <strong>pas</strong></em>." },
+  ],
+  "questions": [
+    { type:"mc", question:"Quelle est la façon la plus simple de former une question en français ?", options:["Intonation montante","Est-ce que + inversion","Inversion sujet-verbe","Les trois méthodes sont correctes"], answer:"Les trois méthodes sont correctes", feedback:"✓ Il existe 3 façons de poser une question : (1) intonation montante <em>Tu parles français ?</em>, (2) est-ce que <em>Est-ce que tu parles français ?</em>, (3) inversion <em>Parles-tu français ?</em>" },
+    { type:"fill", question:"Formez une question avec <em>est-ce que</em> :<br><br>___ vous habitez à Paris ?", answer:"Est-ce que", feedback:"✓ <strong>Est-ce que</strong> se place au début de la question, suivi du sujet puis du verbe. C'est la façon la plus courante à l'oral." },
+    { type:"mc", question:"Quel mot interrogatif utilise-t-on pour demander le lieu ?", options:["Quand","Pourquoi","Où","Comment"], answer:"Où", feedback:"✓ <strong>Où</strong> = where. Les mots interrogatifs : où (lieu), quand (temps), pourquoi (raison), comment (manière), combien (quantité)." },
+    { type:"fill", question:"Posez la question avec l'inversion :<br><br>___ -il français ? (parler)", answer:"Parle", feedback:"✓ Avec l'inversion, le verbe précède le sujet et est lié par un trait d'union : <strong>Parle-t-il</strong> français ? (on ajoute <em>-t-</em> entre deux voyelles)." },
+  ],
+  "imparfait": [
+    { type:"mc", question:"À quoi sert l'imparfait ?", options:["Actions terminées précises","Descriptions et habitudes passées","Le futur proche","Les ordres"], answer:"Descriptions et habitudes passées", feedback:"✓ L'imparfait s'utilise pour : (1) les descriptions dans le passé <em>Il faisait beau</em>, (2) les habitudes passées <em>Je mangeais toujours ici</em>, (3) les actions en cours interrompues." },
+    { type:"fill", question:"Conjuguez à l'imparfait :<br><br>Quand j'étais enfant, je ___ (jouer) au foot tous les jours.", answer:"jouais", feedback:"✓ L'imparfait se forme sur le radical de <em>nous</em> au présent + terminaisons : -ais, -ais, -ait, -ions, -iez, -aient. <em>Nous jou-ons</em> → <em>je jou-<strong>ais</strong></em>." },
+    { type:"mc", question:"Quelle terminaison utilise-t-on pour <em>nous</em> à l'imparfait ?", options:["-ions","-ions","-aient","-iez"], answer:"-ions", feedback:"✓ Les terminaisons de l'imparfait : -ais, -ais, -ait, <strong>-ions</strong>, -iez, -aient." },
+    { type:"fill", question:"Complétez :<br><br>Il ___ (être) très fatigué hier soir.", answer:"était", feedback:"✓ <em>Être</em> à l'imparfait : j'étais, tu étais, il/elle <strong>était</strong>. C'est un verbe irrégulier mais très fréquent." },
+  ],
+  "prepositions": [
+    { type:"mc", question:"Choisissez la préposition correcte :<br><br>Je vais ___ Paris ce weekend.", options:["à","en","de","dans"], answer:"à", feedback:"✓ On utilise <strong>à</strong> devant les noms de villes : <em>à Paris, à Madrid, à Tokyo</em>. Pour les pays, on utilise <em>en</em> (féminin) ou <em>au/aux</em> (masculin)." },
+    { type:"fill", question:"Complétez avec la bonne préposition :<br><br>Elle vient ___ Espagne.", answer:"d'", feedback:"✓ Pour indiquer l'origine, on utilise <strong>de</strong> + pays. Devant une voyelle : <strong>d'</strong> Espagne, d'Italie. Pour les pays masculins : <em>du</em> Japon." },
+    { type:"mc", question:"Quelle préposition utilise-t-on pour indiquer la possession ?", options:["à","de","dans","sur"], answer:"de", feedback:"✓ La préposition <strong>de</strong> indique la possession : <em>le livre <strong>de</strong> Marie</em>, <em>la maison <strong>de</strong> mes parents</em>." },
+    { type:"fill", question:"Complétez :<br><br>Le chat est ___ la table. (sur/sous/dans — choisissez : on top)", answer:"sur", feedback:"✓ <strong>Sur</strong> = on top of. Les prépositions de lieu : sur (dessus), sous (dessous), dans (inside), devant (in front of), derrière (behind)." },
+  ],
+};
+
+/* ════════════════════════════════════════
+   FIREBASE
+════════════════════════════════════════ */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDu3qHqa3kRLPiGzkfieaCS0XBsFUbFrLM",
+  authDomain: "daniel-apprend.firebaseapp.com",
+  projectId: "daniel-apprend",
+  storageBucket: "daniel-apprend.firebasestorage.app",
+  messagingSenderId: "375161400326",
+  appId: "1:375161400326:web:f7e9da56abfd79a6c96787",
+  measurementId: "G-D305BP1EV5"
+};
+
+const fbApp = initializeApp(firebaseConfig);
+const db = getFirestore(fbApp);
+const USER_DOC = 'users/daniel';
+
+async function fbLoad(field, fallback) {
+  try {
+    const snap = await getDoc(doc(db, USER_DOC.split('/')[0], USER_DOC.split('/')[1]));
+    if (snap.exists() && snap.data()[field] !== undefined) return snap.data()[field];
+  } catch(e) { console.warn('Firebase load error:', e); }
+  return fallback;
+}
+
+async function fbSave(field, value) {
+  try {
+    await setDoc(doc(db, USER_DOC.split('/')[0], USER_DOC.split('/')[1]), { [field]: value }, { merge: true });
+  } catch(e) { console.warn('Firebase save error:', e); }
+}
+
+/* ════════════════════════════════════════
+   STATE
+════════════════════════════════════════ */
+let vocab = [];
+let displayLang = 'fr';
+let currentCat = 'passe-compose';
+let exerciseState = {};
+let customCats = [];
+
+const CAT_NAMES = {
+  'passe-compose':'Passé composé','articles':'Articles (le/la/un/une)',
+  'present':'Conjugaison au présent','negation':'Négation (ne…pas)',
+  'questions':'Poser des questions','imparfait':'Imparfait',
+  'prepositions':'Prépositions'
+};
+
+async function initData() {
+  vocab = await fbLoad('vocab', []);
+  customCats = await fbLoad('customCats', []);
+  const apiKey = await fbLoad('apiKey', '');
+  console.log('Firebase apiKey loaded:', apiKey ? 'YES (length '+apiKey.length+')' : 'EMPTY');
+  if(apiKey) localStorage.setItem('dalf-api-key', apiKey);
+  console.log('localStorage key after set:', localStorage.getItem('dalf-api-key') ? 'YES' : 'EMPTY');
+  updateHomeCount();
+  renderCustomCatButtons();
+}
+
+/* ════════════════════════════════════════
+   AUTH
+════════════════════════════════════════ */
+async function checkPassword(){
+  const val=document.getElementById('pw-input').value;
+  const err=document.getElementById('lock-error');
+  if(val===PASSWORD){
+    const btn=document.querySelector('.lock-btn');
+    btn.textContent='Chargement…';
+    btn.disabled=true;
+    await initData();
+    document.getElementById('lock-screen').style.display='none';
+    document.getElementById('app').style.display='flex';
+    sessionStorage.setItem('dalf-auth','1');
+    btn.textContent='Entrer →';
+    btn.disabled=false;
+  } else {
+    err.textContent='Mot de passe incorrect. Réessayez.';
+    document.getElementById('pw-input').value='';
+    document.getElementById('pw-input').focus();
+  }
+}
+document.getElementById('pw-input').addEventListener('keydown',e=>{if(e.key==='Enter')checkPassword();});
+function logout(){
+  sessionStorage.removeItem('dalf-auth');
+  document.getElementById('app').style.display='none';
+  document.getElementById('lock-screen').style.display='flex';
+  document.getElementById('pw-input').value='';
+  document.getElementById('lock-error').textContent='';
+  showHome();
+}
+if(sessionStorage.getItem('dalf-auth')==='1'){
+  document.getElementById('lock-screen').style.display='none';
+  document.getElementById('app').style.display='flex';
+  initData();
+}
+
+/* ════════════════════════════════════════
+   NAVIGATION
+════════════════════════════════════════ */
+async function showSection(name){
+  document.getElementById('home-view').style.display='none';
+  document.querySelectorAll('.section-view').forEach(v=>v.classList.remove('active'));
+  document.getElementById(name+'-view').classList.add('active');
+  if(name==='vocab') renderCards();
+  if(name==='grammar'){
+    renderCustomCatButtons();
+    loadCategory(currentCat);
+    const apiKey = await fbLoad('apiKey', '');
+    if(apiKey) localStorage.setItem('dalf-api-key', apiKey);
+  }
+}
+function showHome(){
+  document.querySelectorAll('.section-view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('home-view').style.display='block';
+  updateHomeCount();
+}
+
+/* ════════════════════════════════════════
+   API KEY
+════════════════════════════════════════ */
+function saveApiKey(){
+  const key=document.getElementById('api-key-input').value.trim();
+  if(!key.startsWith('sk-')){showToast('Clé API invalide — elle doit commencer par sk-'); return;}
+  localStorage.setItem('dalf-api-key', key);
+  fbSave('apiKey', key);
+  showToast('✓ Clé API enregistrée !');
+}
+function clearApiKey(){
+  localStorage.removeItem('dalf-api-key');
+  fbSave('apiKey', '');
+}
+function getApiKey(){ return localStorage.getItem('dalf-api-key')||''; }
+
+/* ════════════════════════════════════════
+   GRAMMAR — CATEGORY
+════════════════════════════════════════ */
+function selectCategory(btn){
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  currentCat=btn.dataset.cat;
+  // Update custom cat buttons to reflect active state
+  renderCustomCatButtons();
+  // Re-mark active after re-render
+  document.querySelectorAll('.cat-btn').forEach(b=>{
+    b.classList.toggle('active', b.dataset.cat===currentCat);
+  });
+  loadCategory(currentCat);
+}
+
+function getCatState(cat){
+  if(!exerciseState[cat]){
+    exerciseState[cat]=(BUILTIN[cat]||[]).map(ex=>({ex,answered:false,correct:null,userAnswer:''}));
+  }
+  return exerciseState[cat];
+}
+
+function loadCategory(cat){
+  const name = CAT_NAMES[cat] || (customCats.find(c=>c.key===cat)||{}).name || cat;
+  document.getElementById('topic-title').textContent = name;
+  renderExercises(cat);
+}
+
+function resetExercises(){
+  exerciseState[currentCat]=null;
+  loadCategory(currentCat);
+  showToast('↺ Exercices réinitialisés');
+}
+
+/* ════════════════════════════════════════
+   RENDER EXERCISES
+════════════════════════════════════════ */
+function renderExercises(cat){
+  const state=getCatState(cat);
+  const list=document.getElementById('exercise-list');
+
+  // Update count badge
+  const countEl=document.getElementById('count-'+cat);
+  if(countEl) countEl.textContent=state.length;
+
+  // Score bar
+  const answered=state.filter(s=>s.answered);
+  const correct=state.filter(s=>s.correct);
+  const pips=document.getElementById('score-pips');
+  pips.innerHTML=state.map(s=>`<div class="score-pip${s.answered?(s.correct?' correct':' wrong'):''}"></div>`).join('');
+  document.getElementById('score-text').textContent=`${correct.length} / ${answered.length} répondus`;
+
+  if(state.length===0){
+    list.innerHTML=`<div class="ex-empty"><span class="empty-icon">📝</span><p>Aucun exercice pour cette catégorie.<br>Cliquez sur <strong>Nouveaux exercices</strong> pour en créer avec l'IA !</p></div>`;
+    return;
+  }
+
+  list.innerHTML=state.map((s,i)=>renderExCard(s,i,cat)).join('');
+}
+
+function renderExCard(s,i,cat){
+  const ex=s.ex;
+  const num=`<div class="ex-number">Exercice ${i+1}</div>`;
+  const q=`<div class="ex-question">${ex.question}</div>`;
+
+  let body='';
+  if(ex.type==='mc'){
+    const opts=ex.options.map((opt,oi)=>{
+      let cls='ex-option';
+      if(s.answered){
+        if(opt===ex.answer) cls+=' correct';
+        else if(opt===s.userAnswer && s.userAnswer!==ex.answer) cls+=' wrong';
+      }
+      const dis=s.answered?'disabled':'';
+      // Use data attributes to avoid quote-escaping issues in onclick
+      return `<button class="${cls}" ${dis} data-idx="${i}" data-oi="${oi}" data-cat="${esc(cat)}">${esc(opt)}</button>`;
+    }).join('');
+    body=`<div class="ex-options" data-mc="true">${opts}</div>`;
+  } else {
+    const cls='ex-fill-input'+(s.answered?(s.correct?' correct':' wrong'):'');
+    const val=s.answered?esc(s.userAnswer):'';
+    const dis=s.answered?'disabled':'';
+    body=`<div class="ex-fill-row">
+      <input class="${cls}" type="text" id="fill-${i}" data-idx="${i}" data-cat="${esc(cat)}" value="${val}" ${dis} placeholder="Votre réponse..."/>
+      ${!s.answered?`<button class="ex-submit-btn" data-idx="${i}" data-cat="${esc(cat)}">Vérifier</button>`:''}
+    </div>`;
+  }
+
+  let feedback='';
+  if(s.answered){
+    const cls='ex-feedback '+(s.correct?'correct':'wrong');
+    const icon=s.correct?'✓':'✗';
+    const wrongNote=(!s.correct&&ex.type==='fill')?`<br>Réponse correcte : <span class="answer-reveal">${esc(ex.answer)}</span>`:'';
+    feedback=`<div class="${cls}">${icon} ${ex.feedback}${wrongNote}</div>`;
+  }
+
+  return `<div class="ex-card${s.answered?(s.correct?' answered-correct':' answered-wrong'):''}" id="ex-card-${i}">${num}${q}${body}${feedback}</div>`;
+}
+
+/* ════════════════════════════════════════
+   EVENT DELEGATION — answers
+════════════════════════════════════════ */
+document.addEventListener('click', function(e){
+  // MC option
+  const mcBtn = e.target.closest('.ex-options[data-mc] button.ex-option');
+  if(mcBtn && !mcBtn.disabled){
+    const i = parseInt(mcBtn.dataset.idx);
+    const cat = mcBtn.dataset.cat;
+    const state = getCatState(cat);
+    if(state[i] && !state[i].answered){
+      // find which option index was clicked
+      const oi = parseInt(mcBtn.dataset.oi);
+      const choice = state[i].ex.options[oi];
+      state[i].answered=true;
+      state[i].userAnswer=choice;
+      state[i].correct=(choice===state[i].ex.answer);
+      renderExercises(cat);
+      const card=document.getElementById('ex-card-'+i);
+      if(card) card.scrollIntoView({behavior:'smooth',block:'nearest'});
+    }
+    return;
+  }
+  // Fill submit button
+  const fillBtn = e.target.closest('.ex-submit-btn');
+  if(fillBtn){
+    const i = parseInt(fillBtn.dataset.idx);
+    const cat = fillBtn.dataset.cat;
+    doAnswerFill(i, cat);
+    return;
+  }
+});
+
+document.addEventListener('keydown', function(e){
+  if(e.key !== 'Enter') return;
+  const inp = e.target.closest('.ex-fill-input');
+  if(inp){
+    const i = parseInt(inp.dataset.idx);
+    const cat = inp.dataset.cat;
+    doAnswerFill(i, cat);
+  }
+});
+
+function doAnswerFill(i, cat){
+  const state=getCatState(cat);
+  if(!state[i]||state[i].answered) return;
+  const inp=document.getElementById('fill-'+i);
+  const val=(inp?inp.value:'').trim();
+  if(!val){showToast('Entrez votre réponse d\'abord !');return;}
+  state[i].answered=true;
+  state[i].userAnswer=val;
+  const norm=s=>s.toLowerCase().trim().replace(/['']/g,"'");
+  const answers=state[i].ex.answer.split('/').map(a=>norm(a.trim()));
+  state[i].correct=answers.includes(norm(val));
+  renderExercises(cat);
+}
+
+/* ════════════════════════════════════════
+   CUSTOM CATEGORIES
+════════════════════════════════════════ */
+function saveCustomCats(){ fbSave('customCats', customCats); }
+
+function addCustomCategory(){
+  const inp = document.getElementById('custom-cat-input');
+  const name = inp.value.trim();
+  if(!name){ showToast('Entrez un nom de sujet !'); return; }
+  const key = 'custom-' + name.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+  if(customCats.find(c=>c.key===key)){ showToast('Ce sujet existe déjà !'); return; }
+  customCats.push({key, name});
+  saveCustomCats();
+  inp.value='';
+  renderCustomCatButtons();
+  // auto-select it
+  const btn = document.querySelector(`.cat-btn[data-cat="${key}"]`);
+  if(btn) selectCategory(btn);
+  showToast(`✓ "${name}" ajouté !`);
+}
+
+function renderCustomCatButtons(){
+  const container = document.getElementById('custom-cat-list');
+  if(!container) return;
+  container.innerHTML = customCats.map(c=>`
+    <button class="cat-btn${currentCat===c.key?' active':''}" data-cat="${c.key}" onclick="selectCategory(this)" style="padding-right:.5rem;">
+      <span>${esc(c.name)}</span>
+      <span style="display:flex;align-items:center;gap:.3rem;">
+        <span class="cat-count" id="count-${c.key}">0</span>
+        <span onclick="event.stopPropagation();removeCustomCat('${c.key}')" style="color:#ccc;font-size:.8rem;cursor:pointer;padding:0 .2rem;" title="Supprimer">✕</span>
+      </span>
+    </button>`).join('');
+}
+
+function removeCustomCat(key){
+  customCats = customCats.filter(c=>c.key!==key);
+  saveCustomCats();
+  delete exerciseState[key];
+  if(currentCat===key){
+    currentCat='passe-compose';
+    document.querySelector('.cat-btn[data-cat="passe-compose"]').classList.add('active');
+    loadCategory(currentCat);
+  }
+  renderCustomCatButtons();
+  showToast('Sujet supprimé');
+}
+
+/* ════════════════════════════════════════
+   AI GENERATION — replaces exercises
+════════════════════════════════════════ */
+async function generateExercises(){
+  const key=getApiKey();
+  if(!key){
+    showToast('⚠ Ajoutez votre clé API d\'abord !');
+    return;
+  }
+
+  const btn=document.getElementById('gen-btn');
+  btn.disabled=true;
+  btn.innerHTML='<span class="spin">⟳</span> Génération...';
+
+  // Use custom cat name if applicable
+  const catName = CAT_NAMES[currentCat] || (customCats.find(c=>c.key===currentCat)||{}).name || currentCat;
+
+  const prompt=`Tu es un professeur de français expert. Génère exactement 5 exercices de grammaire française sur le thème : "${catName}". Le niveau est A1-A2 (débutant).
+
+Réponds UNIQUEMENT avec un tableau JSON valide, sans texte avant ou après, sans backticks markdown.
+
+Format exact :
+[
+  {
+    "type": "mc",
+    "question": "Question en français",
+    "options": ["option1","option2","option3","option4"],
+    "answer": "option correcte (copie exacte d'une des options)",
+    "feedback": "Explication pédagogique en français"
+  },
+  {
+    "type": "fill",
+    "question": "Complétez : Elle ___ (verbe) quelque chose.",
+    "answer": "réponse exacte",
+    "feedback": "Explication de la règle en français"
+  }
+]
+
+Règles : pour mc, answer doit être la copie exacte d'une option. Alterne mc et fill. Feedback en français.`;
+
+  try {
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:2000,messages:[{role:'user',content:prompt}]})
+    });
+
+    if(!res.ok){
+      const err=await res.json();
+      throw new Error(err.error?.message||'Erreur API');
+    }
+
+    const data=await res.json();
+    const text=data.content[0].text;
+    const clean=text.replace(/```json|```/g,'').trim();
+    const exercises=JSON.parse(clean);
+
+    // REPLACE exercises entirely (fresh set)
+    exerciseState[currentCat]=exercises.map(ex=>({ex,answered:false,correct:null,userAnswer:''}));
+
+    renderExercises(currentCat);
+    showToast('✦ 5 nouveaux exercices générés !');
+  } catch(err){
+    console.error(err);
+    showToast('Erreur : '+err.message);
+  } finally {
+    btn.disabled=false;
+    btn.innerHTML='✦ Nouveaux exercices';
+  }
+}
+
+/* ════════════════════════════════════════
+   VOCAB
+════════════════════════════════════════ */
+function saveVocab(){ fbSave('vocab', vocab); }
+
+function addWord(){
+  const fr=document.getElementById('input-fr').value.trim();
+  const es=document.getElementById('input-es').value.trim();
+  const en=document.getElementById('input-en').value.trim();
+  if(!fr){showToast('Entrez le mot en français !');return;}
+  if(!es){showToast('El español es obligatorio !');return;}
+  vocab.push({id:Date.now(),fr,es,en});
+  saveVocab();
+  ['input-fr','input-es','input-en'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('input-fr').focus();
+  renderCards(); updateHomeCount(); showToast('✓ Mot ajouté !');
+}
+['input-fr','input-es','input-en'].forEach(id=>{
+  document.getElementById(id).addEventListener('keydown',e=>{if(e.key==='Enter')addWord();});
+});
+function deleteWord(id){
+  vocab=vocab.filter(w=>w.id!==id); saveVocab(); renderCards(); updateHomeCount(); showToast('Mot supprimé');
+}
+function shuffleCards(){
+  if(vocab.length<2){showToast('Ajoutez plus de mots d\'abord !');return;}
+  for(let i=vocab.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[vocab[i],vocab[j]]=[vocab[j],vocab[i]];}
+  renderCards(); showToast('⇄ Cartes mélangées !');
+}
+function setDisplayLang(lang){
+  displayLang=lang;
+  document.querySelectorAll('.lang-btn').forEach(btn=>btn.classList.toggle('active',btn.dataset.lang===lang));
+  renderCards();
+}
+const langLabels={fr:'🇫🇷 Français',es:'🇪🇸 Español',en:'🇬🇧 English'};
+function renderCards(){
+  const container=document.getElementById('vocab-cards');
+  const n=vocab.length;
+  document.getElementById('word-count-label').textContent=n===0?'0 mots':n===1?'1 mot':n+' mots';
+  if(n===0){container.innerHTML=`<div class="vocab-empty"><span class="empty-icon">📭</span><p>Aucun mot pour l'instant.<br>Ajoutez votre premier mot ci-dessus !</p></div>`;return;}
+  const backLang=displayLang==='fr'?'es':displayLang==='es'?'fr':'fr';
+  const extraLang=(displayLang!=='en'&&backLang!=='en')?'en':null;
+  const cards=vocab.map((w,i)=>{
+    const fw=w[displayLang]||'—',bw=w[backLang]||'—',ew=extraLang?w[extraLang]:null;
+    return `<div class="flashcard" id="card-${w.id}" style="animation-delay:${Math.min(i,12)*.04}s" onclick="flipCard(${w.id})">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">
+          <button class="card-delete" onclick="event.stopPropagation();deleteWord(${w.id})" title="Supprimer">✕</button>
+          <div class="card-front-lang">${langLabels[displayLang]}</div>
+          <div class="card-front-word">${esc(fw)}</div>
+          <div class="card-front-hint">cliquer pour retourner</div>
+        </div>
+        <div class="flashcard-back">
+          <div class="card-back-lang">${langLabels[backLang]}</div>
+          <div class="card-back-primary">${esc(bw)}</div>
+          ${ew?`<div class="card-back-secondary">${langLabels[extraLang]} ${esc(ew)}</div>`:''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  container.innerHTML=`<div class="flashcard-grid">${cards}</div>`;
+}
+function flipCard(id){const el=document.getElementById('card-'+id);if(el)el.classList.toggle('flipped');}
+function updateHomeCount(){
+  const n=vocab.length;
+  document.getElementById('home-word-count').textContent=n===0?'0 mots':n===1?'1 mot':n+' mots';
+}
+
+/* ════════════════════════════════════════
+   UTILITIES
+════════════════════════════════════════ */
+let toastTimer;
+function showToast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2400);
+}
+function esc(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* Init */
+// Data loads when user logs in via initData()
+
+// Expose functions to window (required for type="module")
+window.checkPassword = checkPassword;
+window.logout = logout;
+window.showSection = showSection;
+window.showHome = showHome;
+window.saveApiKey = saveApiKey;
+window.clearApiKey = clearApiKey;
+window.selectCategory = selectCategory;
+window.resetExercises = resetExercises;
+window.generateExercises = generateExercises;
+window.addCustomCategory = addCustomCategory;
+window.removeCustomCat = removeCustomCat;
+window.addWord = addWord;
+window.deleteWord = deleteWord;
+window.shuffleCards = shuffleCards;
+window.setDisplayLang = setDisplayLang;
+window.flipCard = flipCard;
+window.fbSave = fbSave;
+window.fbLoad = fbLoad;
+</script>
+</body>
+</html>
+
+
