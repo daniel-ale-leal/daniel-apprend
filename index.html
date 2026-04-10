@@ -603,43 +603,11 @@
 
       <!-- Scenario picker -->
       <div id="scenario-picker">
-        <p style="color:var(--muted);font-size:.9rem;margin-bottom:1rem;">Choisissez un scénario pour commencer :</p>
-        <div class="scenario-grid">
-          <div class="scenario-card" onclick="startConversation('professeur')" style="border-color:var(--terracotta);background:linear-gradient(135deg,#fff 80%,rgba(192,113,79,.06))">
-            <span class="scenario-icon">👨‍🏫</span>
-            <div class="scenario-name" style="color:var(--terracotta)">Professeur</div>
-            <div class="scenario-desc">Guidé et corrigé — idéal pour apprendre</div>
-          </div>
-          <div class="scenario-card" onclick="startConversation('libre')">
-            <span class="scenario-icon">💬</span>
-            <div class="scenario-name">Conversation libre</div>
-            <div class="scenario-desc">Parlez de n'importe quel sujet</div>
-          </div>
-          <div class="scenario-card" onclick="startConversation('restaurant')">
-            <span class="scenario-icon">🍽️</span>
-            <div class="scenario-name">Au restaurant</div>
-            <div class="scenario-desc">Commander, demander l'addition</div>
-          </div>
-          <div class="scenario-card" onclick="startConversation('presentation')">
-            <span class="scenario-icon">👋</span>
-            <div class="scenario-name">Se présenter</div>
-            <div class="scenario-desc">Parler de vous, votre vie</div>
-          </div>
-          <div class="scenario-card" onclick="startConversation('direction')">
-            <span class="scenario-icon">🗺️</span>
-            <div class="scenario-name">Demander son chemin</div>
-            <div class="scenario-desc">Dans la rue, dans Paris</div>
-          </div>
-          <div class="scenario-card" onclick="startConversation('shopping')">
-            <span class="scenario-icon">🛍️</span>
-            <div class="scenario-name">Faire les courses</div>
-            <div class="scenario-desc">Dans un magasin ou marché</div>
-          </div>
-          <div class="scenario-card" onclick="startConversation('medecin')">
-            <span class="scenario-icon">🏥</span>
-            <div class="scenario-name">Chez le médecin</div>
-            <div class="scenario-desc">Décrire vos symptômes</div>
-          </div>
+        <div style="text-align:center;padding:2rem 1rem;">
+          <div style="font-size:3rem;margin-bottom:1rem;">🥐</div>
+          <div style="font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--moss);margin-bottom:.5rem;">Marcel est prêt !</div>
+          <div style="font-size:.9rem;color:var(--muted);margin-bottom:1.5rem;">Il vous demandera ce que vous voulez pratiquer.</div>
+          <button onclick="startConversation()" style="padding:.8rem 2rem;background:var(--terracotta);color:#fff;border:none;border-radius:10px;font-family:'Lato',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;">Commencer →</button>
         </div>
       </div>
 
@@ -1506,49 +1474,41 @@ function listenArticle(){
 /* ════════════════════════════════════════
    CONVERSATION
 ════════════════════════════════════════ */
-const SCENARIOS = {
-  professeur:   { label:'👨‍🏫 Professeur',            prompt:`Tu es un professeur de français bienveillant et patient. Ton élève parle espagnol (langue maternelle) et apprend le français niveau A1-A2. Ton objectif est de l'ENSEIGNER, pas juste de converser.
+const MARCEL_PROMPT = `Tu es Marcel, un professeur de français bienveillant, patient et drole. Ton eleve parle espagnol (langue maternelle) et apprend le français niveau A1-A2.
 
-RÈGLES STRICTES :
-- Si l'élève dit quelque chose en espagnol ou en anglais, dis-lui : "En espagnol tu dis '[mot]', en français on dit '[traduction]'. Répète : '[traduction]'" puis repose la question.
-- Si la phrase est incorrecte, explique l'erreur clairement et simplement, donne la version correcte, et demande de répéter.
-- Si la phrase est correcte mais peut être améliorée, félicite d'abord puis montre comment dire mieux.
-- Pose UNE question à la fois. Attends la réponse avant de continuer.
-- Commence par une introduction simple et pose une première question facile.
-- Sois très encourageant : "Très bien !", "Bravo !", "Presque !", "Bonne tentative !"` },
-  libre:        { label:'💬 Conversation libre',   prompt:'Tu es un ami français sympathique. Parle naturellement avec l\'utilisateur sur n\'importe quel sujet. Niveau A1-A2.' },
-  restaurant:   { label:'🍽️ Au restaurant',        prompt:'Tu es un serveur dans un bistrot parisien. Accueille le client, prends sa commande, réponds à ses questions. Sois poli et typiquement français.' },
-  presentation: { label:'👋 Se présenter',          prompt:'Tu rencontres quelqu\'un pour la première fois. Présente-toi et pose des questions pour apprendre à te connaître. Sois chaleureux.' },
-  direction:    { label:'🗺️ Demander son chemin',   prompt:'Tu es un passant parisien. L\'utilisateur te demande son chemin. Donne des directions claires avec des repères réels de Paris.' },
-  shopping:     { label:'🛍️ Faire les courses',     prompt:'Tu es un vendeur dans un marché ou magasin français. Aide le client à trouver des produits, donne les prix, sois commerçant.' },
-  medecin:      { label:'🏥 Chez le médecin',       prompt:'Tu es un médecin généraliste français. Accueille ton patient, pose des questions sur ses symptômes, donne des conseils simples.' },
-};
+Au debut de chaque session, presente-toi brievement et demande ce qu'il veut pratiquer aujourd'hui. Propose 3-4 options courtes : par exemple "la conversation au restaurant", "se presenter", "les directions", "parler de sa journee", ou autre chose s'il prefere.
+
+Une fois qu'il choisit, adapte ton role en consequence et commence a enseigner.
+
+REGLES PERMANENTES :
+- Si l'eleve dit quelque chose en espagnol ou en anglais, dis : "En espagnol tu dis X, en francais on dit Y. Repete : Y" puis repose la question.
+- Si la phrase est incorrecte, explique simplement, donne la version correcte, demande de repeter.
+- Si c'est correct, felicite chaleureusement puis continue.
+- Pose UNE seule question a la fois.
+- Sois tres encourageant : Tres bien, Bravo, Presque, Bonne tentative.
+- Reponds toujours en francais, phrases courtes et claires.
+- N'utilise JAMAIS d'emojis.`;
 
 let convHistory = [];
-let convScenario = null;
+let convScenario = { label: '👨‍🏫 Marcel', prompt: MARCEL_PROMPT };
 let mistakeLog = [];
 let isListening = false;
 let convSpeaking = false;
 
-async function startConversation(scenarioKey){
-  convScenario = SCENARIOS[scenarioKey];
+async function startConversation(){
   convHistory = [];
 
   document.getElementById('scenario-picker').style.display = 'none';
   document.getElementById('conversation-area').style.display = 'block';
-  document.getElementById('conv-scenario-badge').textContent = convScenario.label;
+  document.getElementById('conv-scenario-badge').textContent = '👨‍🏫 Marcel';
   document.getElementById('conv-messages').innerHTML = '';
   document.getElementById('conv-transcript').textContent = '';
   document.getElementById('mistakes-panel').style.display = 'none';
 
-  // Load mistake log from Firebase
   mistakeLog = await fbLoad('mistakeLog', []);
   renderMistakes();
 
-  // Build voice picker (voices may load async)
-
-  // Claude opens the conversation
-  setConvStatus('Claude prépare la conversation...');
+  setConvStatus('Marcel arrive...');
   await claudeRespond('[START]');
 }
 
@@ -1639,7 +1599,7 @@ let audioContext = null;
 let silenceAnalyser = null;
 let silenceStream = null;
 let silenceDetectionFrame = null;
-const SILENCE_THRESHOLD = 30;  // raised — ignores background noise/dogs
+const SILENCE_THRESHOLD = 38;  // raised — ignores background noise/dogs
 const SILENCE_DELAY = 2200;    // ms of silence before auto-send
 
 function startListening(){
@@ -1925,7 +1885,6 @@ function addMessageWithCorrection(role, text, correction){
 async function speakText(text, onEnd){
   const openaiKey = getOpenAIKey();
   if(!openaiKey){
-    // Fallback to browser TTS if no OpenAI key
     const utt = new SpeechSynthesisUtterance(text);
     utt.lang = 'fr-FR'; utt.rate = 0.85;
     if(onEnd) utt.onend = onEnd;
@@ -1943,30 +1902,29 @@ async function speakText(text, onEnd){
       body: JSON.stringify({
         model: 'tts-1',
         input: text,
-        voice: 'nova',   // nova = warm female French, sounds great
-        speed: 0.92
+        voice: 'nova',
+        speed: 0.95,
+        response_format: 'mp3'
       })
     });
 
     if(!res.ok) throw new Error('TTS error ' + res.status);
 
-    const arrayBuffer = await res.arrayBuffer();
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const decoded = await audioCtx.decodeAudioData(arrayBuffer);
-    const source = audioCtx.createBufferSource();
-    source.buffer = decoded;
-    source.connect(audioCtx.destination);
-    source.onended = () => { audioCtx.close(); if(onEnd) onEnd(); };
-    source.start(0);
+    // Stream audio via blob URL — starts playing as soon as data arrives
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const audio = new Audio(url);
+    audio.onended = () => { URL.revokeObjectURL(url); if(onEnd) onEnd(); };
+    audio.onerror = () => { URL.revokeObjectURL(url); if(onEnd) onEnd(); };
+    await audio.play();
 
   } catch(err) {
     console.error('TTS error:', err);
-    // Fallback to browser TTS
     const utt = new SpeechSynthesisUtterance(text);
     utt.lang = 'fr-FR'; utt.rate = 0.85;
     if(onEnd) utt.onend = onEnd;
     window.speechSynthesis.speak(utt);
-    if(onEnd) setTimeout(onEnd, text.length * 60);
+    if(!window.speechSynthesis.speaking && onEnd) setTimeout(onEnd, text.length * 55);
   }
 }
 
